@@ -16,4 +16,4 @@ ipython
 intake-parquet
 fastparquet
 s3fs
-python-snappy
+
