@@ -130,4 +130,4 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
-autodoc_mock_imports = ['snappy', 'python-snappy']
+autodoc_mock_imports = ['snappy']
