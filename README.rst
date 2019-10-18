@@ -23,10 +23,12 @@ Conda stats
 * Documentation: https://condastats.readthedocs.io.
 
 
-Features
+Examples
 --------
 
-* TODO
+`condastats overall pandas 2019-01`
+
+`condastats system pandas 2019-01`
 
 Credits
 -------
