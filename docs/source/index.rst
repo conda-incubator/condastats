@@ -11,7 +11,7 @@ This package is the Python version of the R package condastats (https://condasta
    :caption: Contents:
    
    installation
-   contents
+   condastats
 
 
 Indices and tables
