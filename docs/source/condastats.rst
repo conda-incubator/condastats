@@ -8,13 +8,11 @@ condastats
 Examples
 ---------------
 
-.. ipython:: python
+.. codeblock:: python
 
-   %%bash
    condastats overall pandas 2019-01
 
 
-.. ipython:: python
+.. codeblock:: python
 
-   %%bash
    condastats system pandas 2019-01
