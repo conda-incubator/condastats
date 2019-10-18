@@ -129,3 +129,5 @@ texinfo_documents = [
      'One line description of project.',
      'Miscellaneous'),
 ]
+
+autodoc_mock_imports = ['snappy', 'python-snappy']
