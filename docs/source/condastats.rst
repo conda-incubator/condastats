@@ -8,11 +8,11 @@ condastats
 Examples
 ---------------
 
-.. codeblock:: python
+.. highlight:: shell
 
    condastats overall pandas 2019-01
 
 
-.. codeblock:: python
+.. highlight:: shell
 
    condastats system pandas 2019-01
