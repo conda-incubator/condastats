@@ -18,6 +18,9 @@ requirements = [
     'dask'
 ]
 
+if not os.getenv('READTHEDOCS'):
+    install_requires.append('python-snappy')
+
 setup_requirements = [ ]
 
 test_requirements = [
