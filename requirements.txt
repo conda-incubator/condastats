@@ -13,4 +13,5 @@ numpy
 pandas
 requests
 ipython
-
+intake-parquet
+fastparquet
