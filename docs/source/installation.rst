@@ -38,7 +38,7 @@ Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl -OJL https://github.com/sophiamyang/condastats/tarball/master
+    $ curl  -OL https://github.com/sophiamyang/condastats/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
