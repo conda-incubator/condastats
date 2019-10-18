@@ -130,4 +130,9 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+autodoc_default_options = {
+    'undoc-members': None,
+}
+
+autodoc_member_order = 'groupwise'
 autodoc_mock_imports = ['snappy']
