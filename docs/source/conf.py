@@ -30,8 +30,7 @@ author = 'Sophia Man Yang'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode',
-'IPython.sphinxext.ipython_console_highlighting','IPython.sphinxext.ipython_directive']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
