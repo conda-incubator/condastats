@@ -15,12 +15,10 @@ requirements = [
     'pandas',
     'requests',
     'intake',
-    'dask'
+    'dask',
+    's3fs',
+    'intake-parquet'
 ]
-
-import os
-if not os.getenv('READTHEDOCS'):
-    requirements.append('python-snappy')
 
 setup_requirements = [ ]
 
