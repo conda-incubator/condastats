@@ -14,9 +14,12 @@ with open('HISTORY.rst') as history_file:
 requirements = [ 
     'dask[dataframe]',
     'fastparquet',
-    's3fs',
-    'python-snappy'
+    's3fs'
 ]
+
+import os
+if not os.getenv('READTHEDOCS'):
+    requirements.append('python-snappy')
 
 setup_requirements = [ ]
 
