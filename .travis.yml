@@ -8,17 +8,14 @@ python:
   - 2.7
 
 # Command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
-install: 
-  # Install conda
-  - wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update conda
+addons:
+  apt:
+    packages:
+      - libsnappy-dev
 
-  # Install dependencies
-  - conda create -n test python=$TRAVIS_PYTHON_VERSION pytest python-snappy
-  - conda activate test
+install: 
+  - pip install pytest
+
   
 # Command to run tests, e.g. python setup.py test
 script: 
