@@ -8,7 +8,8 @@ import argparse
 
 
 def load_pkg_month(year, month, package, pkg_platform=None, data_source=None, pkg_version=None, pkg_python=None):
-    df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{year}/{year}-{month}.parquet')
+    df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{year}/{year}-{month}.parquet',
+                         storage_options={'anon': True})
     df = df.query(f'pkg_name in ("{package}")')
     
     queries = []
@@ -28,28 +29,32 @@ def load_pkg_month(year, month, package, pkg_platform=None, data_source=None, pk
 
 def pkg_platform_month(year, month, package):
     df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{year}/{year}-{month}.parquet',
-                        columns=['pkg_name','pkg_platform','counts'])
+                        columns=['pkg_name','pkg_platform','counts'],
+                        storage_options={'anon': True})
     df = df.query(f'pkg_name in ("{package}")')
     agg = df.groupby('pkg_platform').counts.sum().compute()
     return agg[agg!=0]
 
 def data_source_month(year, month, package):
     df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{year}/{year}-{month}.parquet',
-                        columns=['pkg_name','data_source','counts'])
+                        columns=['pkg_name','data_source','counts'],
+                        storage_options={'anon': True})
     df = df.query(f'pkg_name in ("{package}")')
     agg = df.groupby('data_source').counts.sum().compute()
     return agg[agg!=0]
 
 def pkg_version_month(year, month, package):
     df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{year}/{year}-{month}.parquet',
-                        columns=['pkg_name','pkg_version','counts'])
+                        columns=['pkg_name','pkg_version','counts'],
+                        storage_options={'anon': True})
     df = df.query(f'pkg_name in ("{package}")')
     agg = df.groupby('pkg_version').counts.sum().compute()
     return agg[agg!=0]
 
 def pkg_python_month(year, month, package):
     df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{year}/{year}-{month}.parquet',
-                        columns=['pkg_name','pkg_python','counts'])
+                        columns=['pkg_name','pkg_python','counts'],
+                        storage_options={'anon': True})
     df = df.query(f'pkg_name in ("{package}")')
     agg = df.groupby('pkg_python').counts.sum().compute()
     return agg[agg!=0]
