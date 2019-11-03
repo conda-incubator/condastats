@@ -28,7 +28,13 @@ Examples
 
 `condastats overall pandas 2019-01`
 
-`condastats system pandas 2019-01`
+`condastats overall pandas 2019-01 --package_platform linux-32 --source anaconda --package_version 0.10.0 --python_version 2.6`
+
+`condastats source pandas 2019-01`
+
+`condastats package_version pandas 2019-01`
+
+`condastats python_version pandas 2019-01`
 
 Credits
 -------
