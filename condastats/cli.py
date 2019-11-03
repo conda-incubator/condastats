@@ -4,8 +4,6 @@
 import sys
 import dask.dataframe as dd
 from datetime import datetime
-import numpy as np
-import pandas as pd
 import argparse
 
 

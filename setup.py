@@ -12,13 +12,10 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [ 
-    'pandas',
-    'requests',
-    'intake',
-    'dask',
+    'dask[dataframe]',
+    'fastparquet',
     's3fs',
-    'intake-parquet',
-    'cython'
+    'python-snappy'
 ]
 
 setup_requirements = [ ]
