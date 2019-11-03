@@ -16,10 +16,13 @@ pandas package download counts for Jan. 2019:
 >>> 932443
 
 
+pandas package download counts for Jan. 2019 for specific package platform, data source, package version, and python version: 
+
 :: 
 
    condastats overall pandas 2019-01 --package_platform linux-32 --source anaconda --package_version 0.10.0 --python_version 2.6
 >>> 12
+
 
 condastats platform
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -53,6 +56,7 @@ pandas package download counts for each operating system for Jan. 2019:
 | win-64       | 134882 | 
 +--------------+--------+
 
+
 condastats data source
 ~~~~~~~~~~~~~~~~~~~~~~
 pandas package download counts for each data source for Jan. 2019:
@@ -68,6 +72,7 @@ pandas package download counts for each data source for Jan. 2019:
 +--------------+--------+
 | conda-forge  | 258940 | 
 +--------------+--------+
+
 
 condastats python_version
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -95,6 +100,7 @@ pandas package download counts for each python version for Jan. 2019:
 | 3.7          | 99375  | 
 +--------------+--------+
 
+
 condastats package_version
 ~~~~~~~~~~~~~~~~~~~~~~
 pandas package download counts for each package version for Jan. 2019:
@@ -102,3 +108,21 @@ pandas package download counts for each package version for Jan. 2019:
 :: 
 
    condastats package_version pandas 2019-01
+
++--------------+--------+
+|              |        | 
++==============+========+
+| 0.10.0       | 180    | 
++--------------+--------+
+| 0.10.1       | 180    | 
++--------------+--------+
+| 0.11.0       | 180    | 
++--------------+--------+
+| 0.12.0       | 180    | 
++--------------+--------+
+| 0.13.0       | 180    | 
++--------------+--------+
+| 0.13.1       | 180    | 
++--------------+--------+
+| 0.14.0       | 180    | 
++--------------+--------+
