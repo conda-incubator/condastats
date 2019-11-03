@@ -18,7 +18,7 @@ requirements = [
     'dask',
     's3fs',
     'intake-parquet',
-    'Cython'
+    'cython'
 ]
 
 setup_requirements = [ ]
