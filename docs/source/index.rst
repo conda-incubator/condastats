@@ -1,10 +1,7 @@
 Welcome to condastats's documentation!
 ====================================
 
-CRAN download counts for R packages
-
-Note:
-This package is the Python version of the R package condastats (https://condastats.r-pkg.org/).
+Conda package stats CLI
 
 .. toctree::
    :maxdepth: 2
