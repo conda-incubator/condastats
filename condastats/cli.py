@@ -6,12 +6,28 @@ import dask.dataframe as dd
 from datetime import datetime
 import argparse
 
+def load_pkg_month(package, month=None, start_month=None, end_month=None, monthly=None, pkg_platform=None, data_source=None, pkg_version=None, pkg_python=None):
 
-def load_pkg_month(year, month, package, pkg_platform=None, data_source=None, pkg_version=None, pkg_python=None):
-    df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{year}/{year}-{month}.parquet',
+    # if all optional arguments are None, read in all the data for a certain package
+    df = dd.read_parquet('s3://anaconda-package-data/conda/monthly/*/*.parquet',storage_options={'anon': True})
+    df = df.query(f'pkg_name in ("{package}")') 
+
+    # if given year-month, read in data for this year-month for this package 
+    if month is not None: 
+        df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
                          storage_options={'anon': True})
-    df = df.query(f'pkg_name in ("{package}")')
+        df = df.query(f'pkg_name in ("{package}")')        
     
+    # if given start_month and end_month, read in data between start_month and end_month
+    if start_month is not None and end_month is not None:
+        #read in month between start_month and end_month
+        file_list = []
+        for month_i in pd.period_range(start_month, end_month, freq='M'):      
+            file_list.append(f's3://anaconda-package-data/conda/monthly/{month_i.year}/{month_i}.parquet')
+        df = dd.read_parquet(file_list,storage_options={'anon': True})
+        df = df.query(f'pkg_name in ("{package}")') 
+
+    # subset data based on other conditions if given
     queries = []
     if pkg_platform is not None:
         queries.append(f'pkg_platform in ("{pkg_platform}")')
@@ -23,8 +39,14 @@ def load_pkg_month(year, month, package, pkg_platform=None, data_source=None, pk
         queries.append(f'pkg_python in ("{pkg_python}")')
     if queries:
         df = df.query(' and '.join(queries))
-        
-    return (df.counts.sum().compute())
+    
+    # return sum of all counts 
+    if monthly is None:
+        return (df.counts.sum().compute())   
+    # if monthly, return monthly counts
+    elif monthly is not None:
+        return (df.groupby('time').counts.sum().compute())
+
 
 def _groupby(year, month, package, column):
     df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{year}/{year}-{month}.parquet',
@@ -58,11 +80,29 @@ def main():
                         help="package name"
                        )
 
-    parser_overall.add_argument("month",
+    parser_overall.add_argument("--month",
                         help="month - YYYY-MM",
-                        type=lambda d: datetime.strptime(d, '%Y-%m')
+                        type=lambda d: datetime.strptime(d, '%Y-%m'),
+                        default=None
                        )
-    
+
+    parser_overall.add_argument("--start_month",
+                        help="start month - YYYY-MM",
+                        type=lambda d: datetime.strptime(d, '%Y-%m'),
+                        default=None
+                       )
+ 
+    parser_overall.add_argument("--end_month",
+                        help="end month - YYYY-MM",
+                        type=lambda d: datetime.strptime(d, '%Y-%m'),
+                        default=None
+                       )
+
+    parser_overall.add_argument("--monthly",
+                        help="To get monthly data, set monthly as True",
+                        default=None
+                       )
+
     parser_overall.add_argument("--package_platform",
                         help="package platform e.g., win-64, linux-32, osx-64.",
                         default=None 
@@ -128,9 +168,11 @@ def main():
 
     if args.subparserdest == 'overall':
         print(load_pkg_month(
-            year=args.month.year, 
-            month=args.month.strftime('%m'), 
             package=args.package,
+            month=args.month, 
+            start_month=args.start_month,
+            end_month = args.end_month,
+            monthly=args.monthly,
             pkg_platform=args.package_platform,
             data_source=args.source,
             pkg_version=args.package_version,
