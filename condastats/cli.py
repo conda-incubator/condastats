@@ -3,6 +3,7 @@
 """Console script for condastats."""
 import sys
 import dask.dataframe as dd
+import pandas as pd
 from datetime import datetime
 import argparse
 
@@ -48,25 +49,54 @@ def load_pkg_month(package, month=None, start_month=None, end_month=None, monthl
         return (df.counts.sum().compute())   
 
 
-def _groupby(month, package, column):
-    df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
-                        columns=['pkg_name', column, 'counts'],
+def _groupby(package, column, month, start_month, end_month, monthly):
+    
+    # if all optional arguments are None, read in all the data for a certain package    
+    df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/*/*.parquet',
+                        columns=['time','pkg_name', column, 'counts'],
                         storage_options={'anon': True})
     df = df.query(f'pkg_name in ("{package}")')
-    agg = df.groupby(column).counts.sum().compute()
+
+    # if given year-month, read in data for this year-month for this package 
+    if month is not None: 
+        df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
+                        columns=['time','pkg_name', column, 'counts'],
+                        storage_options={'anon': True})
+        df = df.query(f'pkg_name in ("{package}")')        
+
+    # if given start_month and end_month, read in data between start_month and end_month
+    if start_month is not None and end_month is not None:
+        #read in month between start_month and end_month
+        file_list = []
+        for month_i in pd.period_range(start_month, end_month, freq='M'):      
+            file_list.append(f's3://anaconda-package-data/conda/monthly/{month_i.year}/{month_i}.parquet')
+        df = dd.read_parquet(file_list,columns=['time','pkg_name', column, 'counts'], storage_options={'anon': True})
+        df = df.query(f'pkg_name in ("{package}")') 
+
+    # if monthly, return monthly counts
+    if monthly:
+        agg = df.groupby(['time', column]).counts.sum().compute()
+    # return sum of all counts 
+    else:
+        agg = df.groupby(column).counts.sum().compute()
+    
     return agg[agg!=0]
 
-def pkg_platform_month(month, package):
-    return _groupby(month, package, 'pkg_platform')
 
-def data_source_month(month, package):
-    return _groupby(month, package, 'data_source')
+def pkg_platform_month(package, month=None, start_month=None, end_month=None, monthly=False):
+    return _groupby(package, 'pkg_platform', month, start_month, end_month, monthly)
 
-def pkg_version_month(month, package):
-    return _groupby(month, package, 'pkg_version')
 
-def pkg_python_month(month, package):
-    return _groupby(month, package, 'pkg_python')
+def data_source_month(package, month=None, start_month=None, end_month=None, monthly=False):
+    return _groupby(package, 'data_source', month, start_month, end_month, monthly)
+
+
+def pkg_version_month(package, month=None, start_month=None, end_month=None, monthly=False):
+    return _groupby(package, 'pkg_version', month, start_month, end_month, monthly)
+
+
+def pkg_python_month(package, month=None, start_month=None, end_month=None, monthly=False):
+    return _groupby(package, 'pkg_python', month, start_month, end_month, monthly)
 
 
 def main():
@@ -128,9 +158,27 @@ def main():
                         help="package name"
                        )
 
-    parser_platform.add_argument("month",
+    parser_platform.add_argument("--month",
                         help="month - YYYY-MM",
-                        type=lambda d: datetime.strptime(d, '%Y-%m')
+                        type=lambda d: datetime.strptime(d, '%Y-%m'),
+                        default=None
+                       )
+
+    parser_platform.add_argument("--start_month",
+                        help="start month - YYYY-MM",
+                        type=lambda d: datetime.strptime(d, '%Y-%m'),
+                        default=None
+                       )
+ 
+    parser_platform.add_argument("--end_month",
+                        help="end month - YYYY-MM",
+                        type=lambda d: datetime.strptime(d, '%Y-%m'),
+                        default=None
+                       )
+
+    parser_platform.add_argument("--monthly",
+                        help="return monthly values",
+                        action='store_true'
                        )
 
     parser_source = subparsers.add_parser('source')
@@ -139,31 +187,85 @@ def main():
                         help="package name"
                        )
 
-    parser_source.add_argument("month",
+    parser_source.add_argument("--month",
                         help="month - YYYY-MM",
-                        type=lambda d: datetime.strptime(d, '%Y-%m')
+                        type=lambda d: datetime.strptime(d, '%Y-%m'),
+                        default=None
                        )
+    parser_source.add_argument("--start_month",
+                        help="start month - YYYY-MM",
+                        type=lambda d: datetime.strptime(d, '%Y-%m'),
+                        default=None
+                       )
+ 
+    parser_source.add_argument("--end_month",
+                        help="end month - YYYY-MM",
+                        type=lambda d: datetime.strptime(d, '%Y-%m'),
+                        default=None
+                       )
+
+    parser_source.add_argument("--monthly",
+                        help="return monthly values",
+                        action='store_true'
+                       )
+
+
     parser_package_version = subparsers.add_parser('package_version')
 
     parser_package_version.add_argument("package",
                         help="package name"
                        )
 
-    parser_package_version.add_argument("month",
+    parser_package_version.add_argument("--month",
                         help="month - YYYY-MM",
-                        type=lambda d: datetime.strptime(d, '%Y-%m')
+                        type=lambda d: datetime.strptime(d, '%Y-%m'),
+                        default=None
                        )
-    
+    parser_package_version.add_argument("--start_month",
+                        help="start month - YYYY-MM",
+                        type=lambda d: datetime.strptime(d, '%Y-%m'),
+                        default=None
+                       )
+ 
+    parser_package_version.add_argument("--end_month",
+                        help="end month - YYYY-MM",
+                        type=lambda d: datetime.strptime(d, '%Y-%m'),
+                        default=None
+                       )
+
+    parser_package_version.add_argument("--monthly",
+                        help="return monthly values",
+                        action='store_true'
+                       )
+
     parser_python_version = subparsers.add_parser('python_version')
 
     parser_python_version.add_argument("package",
                         help="package name"
                        )
 
-    parser_python_version.add_argument("month",
+    parser_python_version.add_argument("--month",
                         help="month - YYYY-MM",
-                        type=lambda d: datetime.strptime(d, '%Y-%m')
+                        type=lambda d: datetime.strptime(d, '%Y-%m'),
+                        default=None
                        )
+    parser_python_version.add_argument("--start_month",
+                        help="start month - YYYY-MM",
+                        type=lambda d: datetime.strptime(d, '%Y-%m'),
+                        default=None
+                       )
+ 
+    parser_python_version.add_argument("--end_month",
+                        help="end month - YYYY-MM",
+                        type=lambda d: datetime.strptime(d, '%Y-%m'),
+                        default=None
+                       )
+
+    parser_python_version.add_argument("--monthly",
+                        help="return monthly values",
+                        action='store_true'
+                       )
+
     args = parser.parse_args()
 
     if args.subparserdest == 'overall':
@@ -179,13 +281,21 @@ def main():
             pkg_python=args.python_version
             ))
     elif args.subparserdest == 'platform':
-        print(pkg_platform_month(args.month, args.package))
+        print(pkg_platform_month(
+            package=args.package, month=args.month, start_month=args.start_month, end_month=args.end_month,monthly=args.monthly
+            ))
     elif args.subparserdest == 'source':
-        print(data_source_month(args.month, args.package))
+        print(data_source_month(
+            package=args.package, month=args.month, start_month=args.start_month, end_month=args.end_month,monthly=args.monthly
+            ))
     elif args.subparserdest == 'package_version':
-        print(pkg_version_month(args.month, args.package))
+        print(pkg_version_month(
+            package=args.package, month=args.month, start_month=args.start_month, end_month=args.end_month,monthly=args.monthly
+            ))
     elif args.subparserdest == 'python_version':
-        print(pkg_python_month(args.month, args.package))
+        print(pkg_python_month(
+            package=args.package, month=args.month, start_month=args.start_month, end_month=args.end_month,monthly=args.monthly
+            ))
 
 
 if __name__ == "__main__":
