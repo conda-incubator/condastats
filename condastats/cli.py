@@ -49,10 +49,12 @@ def load_pkg_month(package, month=None, start_month=None, end_month=None, monthl
     
     # if monthly, return monthly counts
     if monthly:
-        return (df.groupby('time').counts.sum().compute())
+        monthly_counts = (df.groupby(['pkg_name','time']).counts.sum().compute())
+        return monthly_counts[(monthly_counts!=0)].dropna()
     # return sum of all counts 
     else:
-        return (df.counts.sum().compute())   
+        total_counts = (df.groupby('pkg_name').counts.sum().compute()).dropna()  
+        return  total_counts[(total_counts!=0)].dropna()
 
 
 def _groupby(package, column, month, start_month, end_month, monthly):
@@ -84,10 +86,10 @@ def _groupby(package, column, month, start_month, end_month, monthly):
 
     # if monthly, return monthly counts
     if monthly:
-        agg = df.groupby(['time', column]).counts.sum().compute()
+        agg = df.groupby(['pkg_name', 'time', column]).counts.sum().compute()
     # return sum of all counts 
     else:
-        agg = df.groupby(column).counts.sum().compute()
+        agg = df.groupby(['pkg_name',column]).counts.sum().compute()
     
     return agg[(agg!=0)].dropna()
 
@@ -116,7 +118,8 @@ def main():
     parser_overall = subparsers.add_parser('overall')
 
     parser_overall.add_argument("package",
-                        help="package name"
+                        help="package name",
+                        nargs='+'
                        )
 
     parser_overall.add_argument("--month",
@@ -164,7 +167,8 @@ def main():
     parser_platform = subparsers.add_parser('platform')
 
     parser_platform.add_argument("package",
-                        help="package name"
+                        help="package name",
+                        nargs='+'
                        )
 
     parser_platform.add_argument("--month",
@@ -193,7 +197,8 @@ def main():
     parser_source = subparsers.add_parser('source')
 
     parser_source.add_argument("package",
-                        help="package name"
+                        help="package name",
+                        nargs='+'
                        )
 
     parser_source.add_argument("--month",
@@ -222,7 +227,8 @@ def main():
     parser_package_version = subparsers.add_parser('package_version')
 
     parser_package_version.add_argument("package",
-                        help="package name"
+                        help="package name",
+                        nargs='+'
                        )
 
     parser_package_version.add_argument("--month",
@@ -250,7 +256,8 @@ def main():
     parser_python_version = subparsers.add_parser('python_version')
 
     parser_python_version.add_argument("package",
-                        help="package name"
+                        help="package name",
+                        nargs='+'
                        )
 
     parser_python_version.add_argument("--month",
