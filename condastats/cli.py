@@ -9,12 +9,18 @@ import argparse
 
 def load_pkg_month(package, month=None, start_month=None, end_month=None, monthly=False, pkg_platform=None, data_source=None, pkg_version=None, pkg_python=None):
 
+    # so we can pass in one or more packages
+    # if more than one packages, e.g., ("pandas", "dask"), 
+    # we need to them with "," so that in f-string it can read correctly as pkg_name in ("pandas","dask")
+    if len(package)>1:
+        package= '","'.join(package)
     # if all optional arguments are None, read in all the data for a certain package
     df = dd.read_parquet('s3://anaconda-package-data/conda/monthly/*/*.parquet',storage_options={'anon': True})
     df = df.query(f'pkg_name in ("{package}")') 
 
     # if given year-month, read in data for this year-month for this package 
     if month is not None: 
+        month = datetime.strptime(month, '%Y-%m')
         df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
                          storage_options={'anon': True})
         df = df.query(f'pkg_name in ("{package}")')        
@@ -51,6 +57,8 @@ def load_pkg_month(package, month=None, start_month=None, end_month=None, monthl
 
 def _groupby(package, column, month, start_month, end_month, monthly):
     
+    if len(package)>1:
+        package= '","'.join(package)
     # if all optional arguments are None, read in all the data for a certain package    
     df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/*/*.parquet',
                         columns=['time','pkg_name', column, 'counts'],
@@ -59,6 +67,7 @@ def _groupby(package, column, month, start_month, end_month, monthly):
 
     # if given year-month, read in data for this year-month for this package 
     if month is not None: 
+        month = datetime.strptime(month, '%Y-%m')
         df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
                         columns=['time','pkg_name', column, 'counts'],
                         storage_options={'anon': True})
