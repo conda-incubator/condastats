@@ -6,7 +6,7 @@ import dask.dataframe as dd
 from datetime import datetime
 import argparse
 
-def load_pkg_month(package, month=None, start_month=None, end_month=None, monthly=None, pkg_platform=None, data_source=None, pkg_version=None, pkg_python=None):
+def load_pkg_month(package, month=None, start_month=None, end_month=None, monthly=False, pkg_platform=None, data_source=None, pkg_version=None, pkg_python=None):
 
     # if all optional arguments are None, read in all the data for a certain package
     df = dd.read_parquet('s3://anaconda-package-data/conda/monthly/*/*.parquet',storage_options={'anon': True})
@@ -40,33 +40,33 @@ def load_pkg_month(package, month=None, start_month=None, end_month=None, monthl
     if queries:
         df = df.query(' and '.join(queries))
     
-    # return sum of all counts 
-    if monthly is None:
-        return (df.counts.sum().compute())   
     # if monthly, return monthly counts
-    elif monthly is not None:
+    if monthly:
         return (df.groupby('time').counts.sum().compute())
+    # return sum of all counts 
+    else:
+        return (df.counts.sum().compute())   
 
 
-def _groupby(year, month, package, column):
-    df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{year}/{year}-{month}.parquet',
+def _groupby(month, package, column):
+    df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
                         columns=['pkg_name', column, 'counts'],
                         storage_options={'anon': True})
     df = df.query(f'pkg_name in ("{package}")')
     agg = df.groupby(column).counts.sum().compute()
     return agg[agg!=0]
 
-def pkg_platform_month(year, month, package):
-    return _groupby(year, month, package, 'pkg_platform')
+def pkg_platform_month(month, package):
+    return _groupby(month, package, 'pkg_platform')
 
-def data_source_month(year, month, package):
-    return _groupby(year, month, package, 'data_source')
+def data_source_month(month, package):
+    return _groupby(month, package, 'data_source')
 
-def pkg_version_month(year, month, package):
-    return _groupby(year, month, package, 'pkg_version')
+def pkg_version_month(month, package):
+    return _groupby(month, package, 'pkg_version')
 
-def pkg_python_month(year, month, package):
-    return _groupby(year, month, package, 'pkg_python')
+def pkg_python_month(month, package):
+    return _groupby(month, package, 'pkg_python')
 
 
 def main():
@@ -99,8 +99,8 @@ def main():
                        )
 
     parser_overall.add_argument("--monthly",
-                        help="To get monthly data, set monthly as True",
-                        default=None
+                        help="return monthly values",
+                        action='store_true'
                        )
 
     parser_overall.add_argument("--package_platform",
@@ -179,13 +179,13 @@ def main():
             pkg_python=args.python_version
             ))
     elif args.subparserdest == 'platform':
-        print(pkg_platform_month(args.month.year, args.month.strftime('%m'), args.package))
+        print(pkg_platform_month(args.month, args.package))
     elif args.subparserdest == 'source':
-        print(data_source_month(args.month.year, args.month.strftime('%m'), args.package))
+        print(data_source_month(args.month, args.package))
     elif args.subparserdest == 'package_version':
-        print(pkg_version_month(args.month.year, args.month.strftime('%m'), args.package))
+        print(pkg_version_month(args.month, args.package))
     elif args.subparserdest == 'python_version':
-        print(pkg_python_month(args.month.year, args.month.strftime('%m'), args.package))
+        print(pkg_python_month(args.month, args.package))
 
 
 if __name__ == "__main__":
