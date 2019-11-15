@@ -6,6 +6,7 @@ import dask.dataframe as dd
 import pandas as pd
 from datetime import datetime
 import argparse
+import numpy as np
 
 def load_pkg_month(package, month=None, start_month=None, end_month=None, monthly=False, pkg_platform=None, data_source=None, pkg_version=None, pkg_python=None):
 
@@ -80,7 +81,7 @@ def _groupby(package, column, month, start_month, end_month, monthly):
     else:
         agg = df.groupby(column).counts.sum().compute()
     
-    return agg[agg!=0]
+    return agg[(agg!=0)].dropna()
 
 
 def pkg_platform_month(package, month=None, start_month=None, end_month=None, monthly=False):
