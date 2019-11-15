@@ -10,9 +10,9 @@ import argparse
 def load_pkg_month(package, month=None, start_month=None, end_month=None, monthly=False, pkg_platform=None, data_source=None, pkg_version=None, pkg_python=None):
 
     # so we can pass in one or more packages
-    # if more than one packages, e.g., ("pandas", "dask"), 
+    # if more than one packages, e.g., ("pandas","dask") as a tuple or ["pandas","dask"] as a list, 
     # we need to them with "," so that in f-string it can read correctly as pkg_name in ("pandas","dask")
-    if len(package)>1:
+    if isinstance(package, tuple) or isinstance(package, list) :
         package= '","'.join(package)
     # if all optional arguments are None, read in all the data for a certain package
     df = dd.read_parquet('s3://anaconda-package-data/conda/monthly/*/*.parquet',storage_options={'anon': True})
@@ -57,7 +57,7 @@ def load_pkg_month(package, month=None, start_month=None, end_month=None, monthl
 
 def _groupby(package, column, month, start_month, end_month, monthly):
     
-    if len(package)>1:
+    if isinstance(package, tuple) or isinstance(package, list)  :
         package= '","'.join(package)
     # if all optional arguments are None, read in all the data for a certain package    
     df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/*/*.parquet',
