@@ -96,19 +96,19 @@ def _groupby(package, column, month, start_month, end_month, monthly):
     return agg[(agg!=0)].dropna()
 
 
-def platform(package, month=None, start_month=None, end_month=None, monthly=False):
+def pkg_platform(package, month=None, start_month=None, end_month=None, monthly=False):
     return _groupby(package, 'pkg_platform', month, start_month, end_month, monthly)
 
 
-def source(package, month=None, start_month=None, end_month=None, monthly=False):
+def data_source(package, month=None, start_month=None, end_month=None, monthly=False):
     return _groupby(package, 'data_source', month, start_month, end_month, monthly)
 
 
-def package_version(package, month=None, start_month=None, end_month=None, monthly=False):
+def pkg_version(package, month=None, start_month=None, end_month=None, monthly=False):
     return _groupby(package, 'pkg_version', month, start_month, end_month, monthly)
 
 
-def python_version(package, month=None, start_month=None, end_month=None, monthly=False):
+def pkg_python(package, month=None, start_month=None, end_month=None, monthly=False):
     return _groupby(package, 'pkg_python', month, start_month, end_month, monthly)
 
 
@@ -161,12 +161,12 @@ def main():
                         help="Python version e.g., 0.1.0 (defalt: None)",
                         default=None 
                        )   
-    parser_overall.add_argument("--source",
+    parser_overall.add_argument("--data_source",
                         help="Data source e.g., anaconda, conda-forge (defalt: None)",
                         default=None 
                        )  
 
-    parser_platform = subparsers.add_parser('platform')
+    parser_platform = subparsers.add_parser('pkg_platform')
 
     parser_platform.add_argument("package",
                         help="package name(s)",
@@ -196,7 +196,7 @@ def main():
                         action='store_true'
                        )
 
-    parser_source = subparsers.add_parser('source')
+    parser_source = subparsers.add_parser('data_source')
 
     parser_source.add_argument("package",
                         help="package name(s)",
@@ -226,7 +226,7 @@ def main():
                        )
 
 
-    parser_package_version = subparsers.add_parser('package_version')
+    parser_package_version = subparsers.add_parser('pkg_version')
 
     parser_package_version.add_argument("package",
                         help="package name(s)",
@@ -255,7 +255,7 @@ def main():
                         action='store_true'
                        )
 
-    parser_python_version = subparsers.add_parser('python_version')
+    parser_python_version = subparsers.add_parser('pkg_python')
 
     parser_python_version.add_argument("package",
                         help="package name(s)",
@@ -293,25 +293,25 @@ def main():
             start_month=args.start_month,
             end_month = args.end_month,
             monthly=args.monthly,
-            pkg_platform=args.package_platform,
-            data_source=args.source,
-            pkg_version=args.package_version,
-            pkg_python=args.python_version
+            pkg_platform=args.pkg_platform,
+            data_source=args.data_source,
+            pkg_version=args.pkg_version,
+            pkg_python=args.pkg_python
             ))
-    elif args.subparserdest == 'platform':
-        print(platform(
+    elif args.subparserdest == 'pkg_platform':
+        print(pkg_platform(
             package=args.package, month=args.month, start_month=args.start_month, end_month=args.end_month,monthly=args.monthly
             ))
-    elif args.subparserdest == 'source':
-        print(source(
+    elif args.subparserdest == 'data_source':
+        print(data_source(
             package=args.package, month=args.month, start_month=args.start_month, end_month=args.end_month,monthly=args.monthly
             ))
-    elif args.subparserdest == 'package_version':
-        print(package_version(
+    elif args.subparserdest == 'pkg_version':
+        print(pkg_version(
             package=args.package, month=args.month, start_month=args.start_month, end_month=args.end_month,monthly=args.monthly
             ))
-    elif args.subparserdest == 'python_version':
-        print(python_version(
+    elif args.subparserdest == 'pkg_python':
+        print(pkg_python(
             package=args.package, month=args.month, start_month=args.start_month, end_month=args.end_month,monthly=args.monthly
             ))
 

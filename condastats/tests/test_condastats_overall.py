@@ -1,4 +1,4 @@
-from condastats.cli import overall, platform, package_version, python_version, source
+from condastats.cli import overall, pkg_platform, pkg_version, pkg_python, data_source
 
 def test_overall1():
     x = overall(['pandas','dask'], month='2019-01')
