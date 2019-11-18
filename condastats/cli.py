@@ -147,17 +147,17 @@ def main():
                         action='store_true'
                        )
 
-    parser_overall.add_argument("--package_platform",
+    parser_overall.add_argument("--pkg_platform",
                         help="package platform e.g., win-64, linux-32, osx-64. (defalt: None)",
                         default=None 
                        )
     
-    parser_overall.add_argument("--python_version",
+    parser_overall.add_argument("--pkg_python",
                         help="Python version e.g., 3.7 (defalt: None)",
                         default=None 
                        )
      
-    parser_overall.add_argument("--package_version",
+    parser_overall.add_argument("--pkg_version",
                         help="Python version e.g., 0.1.0 (defalt: None)",
                         default=None 
                        )   
