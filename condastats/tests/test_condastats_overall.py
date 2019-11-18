@@ -1,12 +1,12 @@
-from condastats.cli import load_pkg_month, pkg_platform_month, pkg_python_month, pkg_version_month, data_source_month
+from condastats.cli import overall, platform, package_version, python_version, source
 
-def test_load_pkg_month1():
-    x = load_pkg_month(['pandas','dask'], month='2019-01')
+def test_overall1():
+    x = overall(['pandas','dask'], month='2019-01')
     assert x.loc['pandas'] == 932443
     assert x.loc['dask'] == 221200
 
-def test_load_pkg_month2():
-    x = load_pkg_month('pandas',month='2019-01', pkg_platform='linux-32',data_source='anaconda',pkg_version='0.10.0',pkg_python=2.6)
+def test_overall2():
+    x = overall(['pandas','dask'],month='2019-01', pkg_platform='linux-32',data_source='anaconda',pkg_version='0.10.0',pkg_python=2.6)
     assert x.loc['pandas'] == 12
 
 

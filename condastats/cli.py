@@ -7,7 +7,7 @@ import pandas as pd
 from datetime import datetime
 import argparse
 
-def load_pkg_month(package, month=None, start_month=None, end_month=None, monthly=False, pkg_platform=None, data_source=None, pkg_version=None, pkg_python=None):
+def overall(package, month=None, start_month=None, end_month=None, monthly=False, pkg_platform=None, data_source=None, pkg_version=None, pkg_python=None):
 
     # so we can pass in one or more packages
     # if more than one packages, e.g., ("pandas","dask") as a tuple or ["pandas","dask"] as a list, 
@@ -96,19 +96,19 @@ def _groupby(package, column, month, start_month, end_month, monthly):
     return agg[(agg!=0)].dropna()
 
 
-def pkg_platform_month(package, month=None, start_month=None, end_month=None, monthly=False):
+def platform(package, month=None, start_month=None, end_month=None, monthly=False):
     return _groupby(package, 'pkg_platform', month, start_month, end_month, monthly)
 
 
-def data_source_month(package, month=None, start_month=None, end_month=None, monthly=False):
+def source(package, month=None, start_month=None, end_month=None, monthly=False):
     return _groupby(package, 'data_source', month, start_month, end_month, monthly)
 
 
-def pkg_version_month(package, month=None, start_month=None, end_month=None, monthly=False):
+def package_version(package, month=None, start_month=None, end_month=None, monthly=False):
     return _groupby(package, 'pkg_version', month, start_month, end_month, monthly)
 
 
-def pkg_python_month(package, month=None, start_month=None, end_month=None, monthly=False):
+def python_version(package, month=None, start_month=None, end_month=None, monthly=False):
     return _groupby(package, 'pkg_python', month, start_month, end_month, monthly)
 
 
@@ -287,7 +287,7 @@ def main():
     args = parser.parse_args()
 
     if args.subparserdest == 'overall':
-        print(load_pkg_month(
+        print(overall(
             package=args.package,
             month=args.month, 
             start_month=args.start_month,
@@ -299,19 +299,19 @@ def main():
             pkg_python=args.python_version
             ))
     elif args.subparserdest == 'platform':
-        print(pkg_platform_month(
+        print(platform(
             package=args.package, month=args.month, start_month=args.start_month, end_month=args.end_month,monthly=args.monthly
             ))
     elif args.subparserdest == 'source':
-        print(data_source_month(
+        print(source(
             package=args.package, month=args.month, start_month=args.start_month, end_month=args.end_month,monthly=args.monthly
             ))
     elif args.subparserdest == 'package_version':
-        print(pkg_version_month(
+        print(package_version(
             package=args.package, month=args.month, start_month=args.start_month, end_month=args.end_month,monthly=args.monthly
             ))
     elif args.subparserdest == 'python_version':
-        print(pkg_python_month(
+        print(python_version(
             package=args.package, month=args.month, start_month=args.start_month, end_month=args.end_month,monthly=args.monthly
             ))
 
