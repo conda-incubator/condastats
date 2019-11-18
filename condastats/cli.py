@@ -71,7 +71,8 @@ def _groupby(package, column, month, start_month, end_month, monthly):
 
     # if given year-month, read in data for this year-month for this package 
     if month is not None: 
-        month = datetime.strptime(month, '%Y-%m')
+        if isinstance(month, str):
+            month = datetime.strptime(month, '%Y-%m')
         df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
                         columns=['time','pkg_name', column, 'counts'],
                         storage_options={'anon': True})
