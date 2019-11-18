@@ -120,7 +120,7 @@ def main():
     parser_overall = subparsers.add_parser('overall')
 
     parser_overall.add_argument("package",
-                        help="package name",
+                        help="package name(s)",
                         nargs='+'
                        )
 
@@ -169,7 +169,7 @@ def main():
     parser_platform = subparsers.add_parser('platform')
 
     parser_platform.add_argument("package",
-                        help="package name",
+                        help="package name(s)",
                         nargs='+'
                        )
 
@@ -199,7 +199,7 @@ def main():
     parser_source = subparsers.add_parser('source')
 
     parser_source.add_argument("package",
-                        help="package name",
+                        help="package name(s)",
                         nargs='+'
                        )
 
@@ -229,7 +229,7 @@ def main():
     parser_package_version = subparsers.add_parser('package_version')
 
     parser_package_version.add_argument("package",
-                        help="package name",
+                        help="package name(s)",
                         nargs='+'
                        )
 
@@ -258,7 +258,7 @@ def main():
     parser_python_version = subparsers.add_parser('python_version')
 
     parser_python_version.add_argument("package",
-                        help="package name",
+                        help="package name(s)",
                         nargs='+'
                        )
 
