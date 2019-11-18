@@ -25,9 +25,9 @@ pkg_platform, data_source, pkg_version, and pkg_python. Run
 ``condastats --help`` in terminal or run ``!condastats --help`` in
 Jupyter Notebook to see all sub-commands:
 
-.. code:: ipython3
+.. code:: python
 
-    !condastats --help
+    condastats --help
 
 
 .. parsed-literal::
@@ -52,9 +52,9 @@ version, package verion, and data source. Run
 ``condastats overall --help`` in terminal or run
 ``!condastats overall --help`` in Jupyter Notebook for details:
 
-.. code:: ipython3
+.. code:: python
 
-    !condastats overall --help
+    condastats overall --help
 
 
 .. parsed-literal::
@@ -96,9 +96,9 @@ dataset <https://github.com/ContinuumIO/anaconda-package-data>`__, which
 is from 2017 till the end of last month. Here we show total package
 download statistics for one package (e.g., pandas) and for multiple packages (e.g., pandas, dask, and numpy)
 
-.. code:: ipython3
+.. code:: python
 
-    !condastats overall pandas
+    condastats overall pandas
 
 
 .. parsed-literal::
@@ -108,9 +108,9 @@ download statistics for one package (e.g., pandas) and for multiple packages (e.
     Name: counts, dtype: int64
 
 
-.. code:: ipython3
+.. code:: python
 
-    !condastats overall pandas dask numpy
+    condastats overall pandas dask numpy
 
 
 .. parsed-literal::
@@ -125,9 +125,9 @@ download statistics for one package (e.g., pandas) and for multiple packages (e.
 We can also get package download statistics for speficied month, package
 platform, data source, package version, and python version:
 
-.. code:: ipython3
+.. code:: python
 
-    !condastats overall pandas --month 2019-01 --pkg_platform linux-32 --data_source anaconda \
+    condastats overall pandas --month 2019-01 --pkg_platform linux-32 --data_source anaconda \
     --pkg_version 0.10.0 --pkg_python 2.6
 
 
@@ -141,9 +141,9 @@ platform, data source, package version, and python version:
 And finally, when we pass in the ``monthly`` argument, we will get
 monthly values.
 
-.. code:: ipython3
+.. code:: python
 
-    !condastats overall pandas --start_month 2019-01 --end_month 2019-03 --monthly
+    condastats overall pandas --start_month 2019-01 --end_month 2019-03 --monthly
 
 
 .. parsed-literal::
@@ -173,9 +173,9 @@ The arguments and optional arguments are the same across the four
 subcommands. Let’s take a look at ``condastats pkg_platform --help`` and
 ``condastats data_source --help``:
 
-.. code:: ipython3
+.. code:: python
 
-    !condastats pkg_platform --help
+    condastats pkg_platform --help
 
 
 .. parsed-literal::
@@ -198,9 +198,9 @@ subcommands. Let’s take a look at ``condastats pkg_platform --help`` and
       --monthly             return monthly values (defalt: False)
 
 
-.. code:: ipython3
+.. code:: python
 
-    !condastats data_source --help
+    condastats data_source --help
 
 
 .. parsed-literal::
@@ -227,9 +227,9 @@ start month and the end month of the time period we are interested in.
 For example, we can see package download counts for each python version
 for pandas for a specific month.
 
-.. code:: ipython3
+.. code:: python
 
-    !condastats pkg_python pandas --month 2019-01
+    condastats pkg_python pandas --month 2019-01
 
 
 .. parsed-literal::
@@ -248,9 +248,9 @@ for pandas for a specific month.
 And we can see the monthly counts for each python version with the
 ``monthly`` flag.
 
-.. code:: ipython3
+.. code:: python
 
-    !condastats pkg_python pandas --start_month 2019-01 --end_month 2019-02 --monthly
+    condastats pkg_python pandas --start_month 2019-01 --end_month 2019-02 --monthly
 
 
 .. parsed-literal::
@@ -279,13 +279,13 @@ Python interface
 To use the Python interface, we need to import the functions from the
 ``condastats`` package by running:
 
-.. code:: ipython3
+.. code:: python
 
     from condastats.cli import overall, pkg_platform, pkg_version, pkg_python, data_source
 
 Here are the function signatures for these five functions:
 
-.. code:: ipython3
+.. code:: python
 
     help(overall)
 
@@ -298,7 +298,7 @@ Here are the function signatures for these five functions:
     
 
 
-.. code:: ipython3
+.. code:: python
 
     help(pkg_platform)
 
@@ -311,7 +311,7 @@ Here are the function signatures for these five functions:
     
 
 
-.. code:: ipython3
+.. code:: python
 
     help(pkg_version)
 
@@ -324,7 +324,7 @@ Here are the function signatures for these five functions:
     
 
 
-.. code:: ipython3
+.. code:: python
 
     help(pkg_python)
 
@@ -337,7 +337,7 @@ Here are the function signatures for these five functions:
     
 
 
-.. code:: ipython3
+.. code:: python
 
     help(data_source)
 
@@ -354,7 +354,7 @@ Similar to command line interface, we can get the total package download
 counts for all the available data since 2017, for a given month, or a
 given combination of specifications:
 
-.. code:: ipython3
+.. code:: python
 
     overall(['pandas','dask'])
 
@@ -370,7 +370,7 @@ given combination of specifications:
 
 
 
-.. code:: ipython3
+.. code:: python
 
     overall(['pandas','dask'], month='2019-01')
 
@@ -386,7 +386,7 @@ given combination of specifications:
 
 
 
-.. code:: ipython3
+.. code:: python
 
     overall('pandas',month='2019-01', pkg_platform='linux-32',data_source='anaconda',pkg_version='0.10.0',pkg_python=2.6)
 
@@ -406,7 +406,7 @@ functions will give us package counts for each package platform, package
 version, python version, and data source for a given package. Here are
 two examples with pkg_python:
 
-.. code:: ipython3
+.. code:: python
 
     pkg_python('pandas', month='2019-01')
 
@@ -427,7 +427,7 @@ two examples with pkg_python:
 
 
 
-.. code:: ipython3
+.. code:: python
 
     pkg_python('pandas', start_month='2019-01', end_month='2019-02', monthly=True)
 
