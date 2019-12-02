@@ -3,7 +3,10 @@ condastats
 ============
 
 `condastats <https://github.com/sophiamyang/condastats>`__ is a conda
-statistics API with Python interface and Command Line interface.
+statistics API with Python interface and Command Line interface. This
+project is inspired by
+`pypistats <https://pypi.org/project/pypistats/>`__, which is a
+python client and CLI API for retrieving PyPI package statistics.
 
 
 Data source
