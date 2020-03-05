@@ -6,6 +6,7 @@ import dask.dataframe as dd
 import pandas as pd
 from datetime import datetime
 import argparse
+pd.set_option('display.max_rows', None)
 
 def overall(package, month=None, start_month=None, end_month=None, monthly=False, pkg_platform=None, data_source=None, pkg_version=None, pkg_python=None):
 
