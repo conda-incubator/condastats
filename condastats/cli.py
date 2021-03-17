@@ -15,9 +15,6 @@ def overall(package, month=None, start_month=None, end_month=None, monthly=False
     # we need to them with "," so that in f-string it can read correctly as pkg_name in ("pandas","dask")
     if isinstance(package, tuple) or isinstance(package, list) :
         package= '","'.join(package)
-    # if all optional arguments are None, read in all the data for a certain package
-    df = dd.read_parquet('s3://anaconda-package-data/conda/monthly/*/*.parquet',storage_options={'anon': True})
-    df = df.query(f'pkg_name in ("{package}")') 
 
     # if given year-month, read in data for this year-month for this package 
     if month is not None: 
@@ -29,13 +26,19 @@ def overall(package, month=None, start_month=None, end_month=None, monthly=False
         df = df.query(f'pkg_name in ("{package}")')        
     
     # if given start_month and end_month, read in data between start_month and end_month
-    if start_month is not None and end_month is not None:
+    elif start_month is not None and end_month is not None:
         #read in month between start_month and end_month
         file_list = []
         for month_i in pd.period_range(start_month, end_month, freq='M'):      
             file_list.append(f's3://anaconda-package-data/conda/monthly/{month_i.year}/{month_i}.parquet')
         df = dd.read_parquet(file_list,storage_options={'anon': True})
-        df = df.query(f'pkg_name in ("{package}")') 
+        df = df.query(f'pkg_name in ("{package}")')
+
+    # if all optional arguments are None, read in all the data for a certain package
+    else:
+        # if all optional arguments are None, read in all the data for a certain package
+        df = dd.read_parquet('s3://anaconda-package-data/conda/monthly/*/*.parquet',storage_options={'anon': True})
+        df = df.query(f'pkg_name in ("{package}")')
 
     # subset data based on other conditions if given
     queries = []
@@ -65,10 +68,10 @@ def _groupby(package, column, month, start_month, end_month, monthly):
     if isinstance(package, tuple) or isinstance(package, list)  :
         package= '","'.join(package)
     # if all optional arguments are None, read in all the data for a certain package    
-    df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/*/*.parquet',
-                        columns=['time','pkg_name', column, 'counts'],
-                        storage_options={'anon': True})
-    df = df.query(f'pkg_name in ("{package}")')
+    # df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/*/*.parquet',
+    #                     columns=['time','pkg_name', column, 'counts'],
+    #                     storage_options={'anon': True})
+    # df = df.query(f'pkg_name in ("{package}")')
 
     # if given year-month, read in data for this year-month for this package 
     if month is not None: 
@@ -77,16 +80,47 @@ def _groupby(package, column, month, start_month, end_month, monthly):
         df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
                         columns=['time','pkg_name', column, 'counts'],
                         storage_options={'anon': True})
+
+        print(type(df))
+        print(len(df.index))
+        print()
+
         df = df.query(f'pkg_name in ("{package}")')        
 
     # if given start_month and end_month, read in data between start_month and end_month
-    if start_month is not None and end_month is not None:
+    elif start_month is not None and end_month is not None:
         #read in month between start_month and end_month
         file_list = []
         for month_i in pd.period_range(start_month, end_month, freq='M'):      
             file_list.append(f's3://anaconda-package-data/conda/monthly/{month_i.year}/{month_i}.parquet')
         df = dd.read_parquet(file_list,columns=['time','pkg_name', column, 'counts'], storage_options={'anon': True})
         df = df.query(f'pkg_name in ("{package}")') 
+
+    # if all optional arguments are None, read in all the data for a certain package
+    else:
+        df = dd.read_parquet(f's3://anaconda-package-data/conda/monthly/*/*.parquet',
+                        columns=['time','pkg_name', column, 'counts'],
+                        storage_options={'anon': True})
+        df = df.query(f'pkg_name in ("{package}")')
+
+    print(df.compute())
+    print(type(df))
+    print(len(df.index))
+    print(df)
+    print()
+
+    temp = df.compute()
+    print(type(temp))
+    print(len(df.index))
+    print(temp)
+    print()
+
+    agg = temp.groupby(['pkg_name', 'time', column]).counts.sum()
+
+    print(len(agg.index))
+    exit()
+    # group = df.groupby(['pkg_name',column])
+    # print(df.groupby(['pkg_name',column]).counts.sum().compute())
 
     # if monthly, return monthly counts
     if monthly:
