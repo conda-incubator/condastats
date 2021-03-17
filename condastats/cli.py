@@ -111,9 +111,15 @@ def _groupby(package, column, month, start_month, end_month, monthly):
 
     temp = df.compute()
     print(type(temp))
-    print(len(df.index))
+    print(len(temp.index))
     print(temp)
     print()
+
+    # test = df.set_index(column, sorted=False)
+    # print(type(test))
+    # print(len(test.index))
+    # print(test)
+    # print()
 
     agg = temp.groupby(['pkg_name', 'time', column]).counts.sum()
 
