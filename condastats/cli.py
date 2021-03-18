@@ -16,6 +16,7 @@ def overall(
     start_month=None,
     end_month=None,
     monthly=False,
+    complete=False,
     pkg_platform=None,
     data_source=None,
     pkg_version=None,
@@ -62,6 +63,12 @@ def overall(
             storage_options={"anon": True},
         )
         df = df.query(f'pkg_name in ("{package}")')
+
+    # print(df)
+    if complete:
+        df = df.reset_index(drop=True).compute()
+        df["pkg_name"] = df["pkg_name"].cat.remove_unused_categories()
+        return df
 
     # subset data based on other conditions if given
     queries = []
@@ -211,6 +218,12 @@ def main():
     parser_overall.add_argument(
         "--monthly",
         help="return monthly values (defalt: False)",
+        action="store_true",
+    )
+
+    parser_overall.add_argument(
+        "--complete",
+        help="return all values (defalt: False)",
         action="store_true",
     )
 
@@ -369,6 +382,7 @@ def main():
             overall(
                 package=args.package,
                 month=args.month,
+                complete=args.complete,
                 start_month=args.start_month,
                 end_month=args.end_month,
                 monthly=args.monthly,
