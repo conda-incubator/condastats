@@ -64,9 +64,8 @@ def overall(
         )
         df = df.query(f'pkg_name in ("{package}")')
 
-    # print(df)
     if complete:
-        df = df.reset_index(drop=True).compute()
+        df = df.compute()
         df["pkg_name"] = df["pkg_name"].cat.remove_unused_categories()
         return df
 
@@ -83,19 +82,19 @@ def overall(
     if queries:
         df = df.query(" and ".join(queries))
 
-    df = df.reset_index(drop=True).compute()
+    df = df.compute()
     df["pkg_name"] = df["pkg_name"].cat.remove_unused_categories()
 
     # if monthly, return monthly counts
     if monthly:
         monthly_counts = (
-            df.groupby(["pkg_name", "time"]).counts.sum()
+            df.groupby(["pkg_name", "time"]).sum()
         )
-        return monthly_counts[(monthly_counts != 0)].dropna()
+        return monthly_counts
     # return sum of all counts
     else:
-        total_counts = (df.groupby("pkg_name").counts.sum())
-        return total_counts[(total_counts != 0)].dropna()
+        total_counts = (df.groupby("pkg_name").sum())
+        return total_counts
 
 
 def _groupby(package, column, month, start_month, end_month, monthly):
@@ -140,17 +139,18 @@ def _groupby(package, column, month, start_month, end_month, monthly):
         )
         df = df.query(f'pkg_name in ("{package}")')
 
-    df = df.reset_index(drop=True).compute()
+    df = df.compute()
     df["pkg_name"] = df["pkg_name"].cat.remove_unused_categories()
+    df[column] = df[column].cat.remove_unused_categories()
 
     # if monthly, return monthly counts
     if monthly:
-        agg = df.groupby(["pkg_name", "time", column]).counts.sum()
+        agg = df.groupby(["pkg_name", "time", column]).sum()
     # return sum of all counts
     else:
-        agg = df.groupby(["pkg_name", column]).counts.sum()
+        agg = df.groupby(["pkg_name", column]).sum()
 
-    return agg[(agg != 0)].dropna()
+    return agg
 
 
 def pkg_platform(
