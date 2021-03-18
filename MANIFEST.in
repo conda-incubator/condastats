@@ -1,0 +1,2 @@
+include versioneer.py
+include condastats/_version.py
