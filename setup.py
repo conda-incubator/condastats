@@ -11,6 +11,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [ 
+    'numpy>=1.16.5',
     'dask[dataframe]',
     'fastparquet',
     's3fs'
