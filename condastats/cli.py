@@ -88,12 +88,12 @@ def overall(
     # if monthly, return monthly counts
     if monthly:
         monthly_counts = (
-            df.groupby(["pkg_name", "time"]).sum()
+            df.groupby(["pkg_name", "time"]).counts.sum()
         )
         return monthly_counts
     # return sum of all counts
     else:
-        total_counts = (df.groupby("pkg_name").sum())
+        total_counts = (df.groupby("pkg_name").counts.sum())
         return total_counts
 
 
@@ -145,10 +145,10 @@ def _groupby(package, column, month, start_month, end_month, monthly):
 
     # if monthly, return monthly counts
     if monthly:
-        agg = df.groupby(["pkg_name", "time", column]).sum()
+        agg = df.groupby(["pkg_name", "time", column]).counts.sum()
     # return sum of all counts
     else:
-        agg = df.groupby(["pkg_name", column]).sum()
+        agg = df.groupby(["pkg_name", column]).counts.sum()
 
     return agg
 
