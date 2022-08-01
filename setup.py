@@ -14,7 +14,6 @@ with open('HISTORY.rst') as history_file:
 requirements = [ 
     'numpy>=1.16.5',
     'dask[dataframe]',
-    'fastparquet',
     'pyarrow',
     's3fs'
 ]
