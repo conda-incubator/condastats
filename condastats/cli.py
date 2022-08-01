@@ -38,6 +38,7 @@ def overall(
         df = dd.read_parquet(
             f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
             storage_options={"anon": True},
+            engine="pyarrow"
         )
         df = df.query(f'pkg_name in ("{package}")')
 
@@ -50,7 +51,7 @@ def overall(
             file_list.append(
                 f"s3://anaconda-package-data/conda/monthly/{month_i.year}/{month_i}.parquet"
             )
-        df = dd.read_parquet(file_list, storage_options={"anon": True})
+        df = dd.read_parquet(file_list, storage_options={"anon": True}, engine="pyarrow")
         df = df.query(f'pkg_name in ("{package}")')
 
     # if all optional arguments are None, read in all
@@ -61,6 +62,7 @@ def overall(
         df = dd.read_parquet(
             "s3://anaconda-package-data/conda/monthly/*/*.parquet",
             storage_options={"anon": True},
+            engine="pyarrow"
         )
         df = df.query(f'pkg_name in ("{package}")')
 
@@ -110,6 +112,7 @@ def _groupby(package, column, month, start_month, end_month, monthly):
             f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
             columns=["time", "pkg_name", column, "counts"],
             storage_options={"anon": True},
+            engine="pyarrow"
         )
         df = df.query(f'pkg_name in ("{package}")')
 
@@ -126,6 +129,7 @@ def _groupby(package, column, month, start_month, end_month, monthly):
             file_list,
             columns=["time", "pkg_name", column, "counts"],
             storage_options={"anon": True},
+            engine="pyarrow"
         )
         df = df.query(f'pkg_name in ("{package}")')
 
@@ -136,6 +140,7 @@ def _groupby(package, column, month, start_month, end_month, monthly):
             f"s3://anaconda-package-data/conda/monthly/*/*.parquet",
             columns=["time", "pkg_name", column, "counts"],
             storage_options={"anon": True},
+            engine="pyarrow"
         )
         df = df.query(f'pkg_name in ("{package}")')
 
