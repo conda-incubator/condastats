@@ -1,4 +1,4 @@
-Welcome to condastats's documentation!
+Welcome to condastats' documentation!
 ====================================
 
 Conda package stats CLI
@@ -6,7 +6,7 @@ Conda package stats CLI
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-   
+
    installation
    condastats
 

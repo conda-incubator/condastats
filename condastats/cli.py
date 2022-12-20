@@ -201,57 +201,57 @@ def main():
 
     parser_overall.add_argument(
         "--month",
-        help="month - YYYY-MM (defalt: None)",
+        help="month - YYYY-MM (default: None)",
         type=lambda d: datetime.strptime(d, "%Y-%m"),
         default=None,
     )
 
     parser_overall.add_argument(
         "--start_month",
-        help="start month - YYYY-MM (defalt: None)",
+        help="start month - YYYY-MM (default: None)",
         type=lambda d: datetime.strptime(d, "%Y-%m"),
         default=None,
     )
 
     parser_overall.add_argument(
         "--end_month",
-        help="end month - YYYY-MM (defalt: None)",
+        help="end month - YYYY-MM (default: None)",
         type=lambda d: datetime.strptime(d, "%Y-%m"),
         default=None,
     )
 
     parser_overall.add_argument(
         "--monthly",
-        help="return monthly values (defalt: False)",
+        help="return monthly values (default: False)",
         action="store_true",
     )
 
     parser_overall.add_argument(
         "--complete",
-        help="return all values (defalt: False)",
+        help="return all values (default: False)",
         action="store_true",
     )
 
     parser_overall.add_argument(
         "--pkg_platform",
-        help="package platform e.g., win-64, linux-32, osx-64. (defalt: None)",
+        help="package platform e.g., win-64, linux-32, osx-64. (default: None)",
         default=None,
     )
 
     parser_overall.add_argument(
         "--pkg_python",
-        help="Python version e.g., 3.7 (defalt: None)",
+        help="Python version e.g., 3.7 (default: None)",
         default=None,
     )
 
     parser_overall.add_argument(
         "--pkg_version",
-        help="Python version e.g., 0.1.0 (defalt: None)",
+        help="Python version e.g., 0.1.0 (default: None)",
         default=None,
     )
     parser_overall.add_argument(
         "--data_source",
-        help="Data source e.g., anaconda, conda-forge (defalt: None)",
+        help="Data source e.g., anaconda, conda-forge (default: None)",
         default=None,
     )
 
@@ -261,28 +261,28 @@ def main():
 
     parser_platform.add_argument(
         "--month",
-        help="month - YYYY-MM (defalt: None)",
+        help="month - YYYY-MM (default: None)",
         type=lambda d: datetime.strptime(d, "%Y-%m"),
         default=None,
     )
 
     parser_platform.add_argument(
         "--start_month",
-        help="start month - YYYY-MM (defalt: None)",
+        help="start month - YYYY-MM (default: None)",
         type=lambda d: datetime.strptime(d, "%Y-%m"),
         default=None,
     )
 
     parser_platform.add_argument(
         "--end_month",
-        help="end month - YYYY-MM (defalt: None)",
+        help="end month - YYYY-MM (default: None)",
         type=lambda d: datetime.strptime(d, "%Y-%m"),
         default=None,
     )
 
     parser_platform.add_argument(
         "--monthly",
-        help="return monthly values (defalt: False)",
+        help="return monthly values (default: False)",
         action="store_true",
     )
 
@@ -292,27 +292,27 @@ def main():
 
     parser_source.add_argument(
         "--month",
-        help="month - YYYY-MM (defalt: None)",
+        help="month - YYYY-MM (default: None)",
         type=lambda d: datetime.strptime(d, "%Y-%m"),
         default=None,
     )
     parser_source.add_argument(
         "--start_month",
-        help="start month - YYYY-MM (defalt: None)",
+        help="start month - YYYY-MM (default: None)",
         type=lambda d: datetime.strptime(d, "%Y-%m"),
         default=None,
     )
 
     parser_source.add_argument(
         "--end_month",
-        help="end month - YYYY-MM (defalt: None)",
+        help="end month - YYYY-MM (default: None)",
         type=lambda d: datetime.strptime(d, "%Y-%m"),
         default=None,
     )
 
     parser_source.add_argument(
         "--monthly",
-        help="return monthly values (defalt: False)",
+        help="return monthly values (default: False)",
         action="store_true",
     )
 
@@ -324,27 +324,27 @@ def main():
 
     parser_package_version.add_argument(
         "--month",
-        help="month - YYYY-MM (defalt: None)",
+        help="month - YYYY-MM (default: None)",
         type=lambda d: datetime.strptime(d, "%Y-%m"),
         default=None,
     )
     parser_package_version.add_argument(
         "--start_month",
-        help="start month - YYYY-MM (defalt: None)",
+        help="start month - YYYY-MM (default: None)",
         type=lambda d: datetime.strptime(d, "%Y-%m"),
         default=None,
     )
 
     parser_package_version.add_argument(
         "--end_month",
-        help="end month - YYYY-MM (defalt: None)",
+        help="end month - YYYY-MM (default: None)",
         type=lambda d: datetime.strptime(d, "%Y-%m"),
         default=None,
     )
 
     parser_package_version.add_argument(
         "--monthly",
-        help="return monthly values (defalt: False)",
+        help="return monthly values (default: False)",
         action="store_true",
     )
 
@@ -356,27 +356,27 @@ def main():
 
     parser_python_version.add_argument(
         "--month",
-        help="month - YYYY-MM (defalt: None)",
+        help="month - YYYY-MM (default: None)",
         type=lambda d: datetime.strptime(d, "%Y-%m"),
         default=None,
     )
     parser_python_version.add_argument(
         "--start_month",
-        help="start month - YYYY-MM (defalt: None)",
+        help="start month - YYYY-MM (default: None)",
         type=lambda d: datetime.strptime(d, "%Y-%m"),
         default=None,
     )
 
     parser_python_version.add_argument(
         "--end_month",
-        help="end month - YYYY-MM (defalt: None)",
+        help="end month - YYYY-MM (default: None)",
         type=lambda d: datetime.strptime(d, "%Y-%m"),
         default=None,
     )
 
     parser_python_version.add_argument(
         "--monthly",
-        help="return monthly values (defalt: False)",
+        help="return monthly values (default: False)",
         action="store_true",
     )
 

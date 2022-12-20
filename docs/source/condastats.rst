@@ -38,10 +38,10 @@ Jupyter Notebook to see all sub-commands:
     usage: condastats [-h]
                       {overall,pkg_platform,data_source,pkg_version,pkg_python}
                       ...
-    
+
     positional arguments:
       {overall,pkg_platform,data_source,pkg_version,pkg_python}
-    
+
     optional arguments:
       -h, --help            show this help message and exit
 
@@ -69,27 +69,27 @@ version, package verion, and data source. Run
                               [--pkg_version PKG_VERSION]
                               [--data_source DATA_SOURCE]
                               package [package ...]
-    
+
     positional arguments:
       package               package name(s)
-    
+
     optional arguments:
       -h, --help            show this help message and exit
-      --month MONTH         month - YYYY-MM (defalt: None)
+      --month MONTH         month - YYYY-MM (default: None)
       --start_month START_MONTH
-                            start month - YYYY-MM (defalt: None)
+                            start month - YYYY-MM (default: None)
       --end_month END_MONTH
-                            end month - YYYY-MM (defalt: None)
-      --monthly             return monthly values (defalt: False)
+                            end month - YYYY-MM (default: None)
+      --monthly             return monthly values (default: False)
       --pkg_platform PKG_PLATFORM
                             package platform e.g., win-64, linux-32, osx-64.
-                            (defalt: None)
+                            (default: None)
       --pkg_python PKG_PYTHON
-                            Python version e.g., 3.7 (defalt: None)
+                            Python version e.g., 3.7 (default: None)
       --pkg_version PKG_VERSION
-                            Python version e.g., 0.1.0 (defalt: None)
+                            Python version e.g., 0.1.0 (default: None)
       --data_source DATA_SOURCE
-                            Data source e.g., anaconda, conda-forge (defalt: None)
+                            Data source e.g., anaconda, conda-forge (default: None)
 
 
 The only required argument is ``package``, which can be one or more
@@ -125,7 +125,7 @@ download statistics for one package (e.g., pandas) and for multiple packages (e.
     Name: counts, dtype: int64
 
 
-We can also get package download statistics for speficied month, package
+We can also get package download statistics for specified month, package
 platform, data source, package version, and python version:
 
 .. code:: python
@@ -151,7 +151,7 @@ monthly values.
 
 .. parsed-literal::
 
-    pkg_name  time   
+    pkg_name  time
     pandas    2019-01     932443.0
               2019-02    1049595.0
               2019-03    1268802.0
@@ -187,18 +187,18 @@ subcommands. Let’s take a look at ``condastats pkg_platform --help`` and
                                    [--start_month START_MONTH]
                                    [--end_month END_MONTH] [--monthly]
                                    package [package ...]
-    
+
     positional arguments:
       package               package name(s)
-    
+
     optional arguments:
       -h, --help            show this help message and exit
-      --month MONTH         month - YYYY-MM (defalt: None)
+      --month MONTH         month - YYYY-MM (default: None)
       --start_month START_MONTH
-                            start month - YYYY-MM (defalt: None)
+                            start month - YYYY-MM (default: None)
       --end_month END_MONTH
-                            end month - YYYY-MM (defalt: None)
-      --monthly             return monthly values (defalt: False)
+                            end month - YYYY-MM (default: None)
+      --monthly             return monthly values (default: False)
 
 
 .. code:: python
@@ -211,18 +211,18 @@ subcommands. Let’s take a look at ``condastats pkg_platform --help`` and
     usage: condastats data_source [-h] [--month MONTH] [--start_month START_MONTH]
                                   [--end_month END_MONTH] [--monthly]
                                   package [package ...]
-    
+
     positional arguments:
       package               package name(s)
-    
+
     optional arguments:
       -h, --help            show this help message and exit
-      --month MONTH         month - YYYY-MM (defalt: None)
+      --month MONTH         month - YYYY-MM (default: None)
       --start_month START_MONTH
-                            start month - YYYY-MM (defalt: None)
+                            start month - YYYY-MM (default: None)
       --end_month END_MONTH
-                            end month - YYYY-MM (defalt: None)
-      --monthly             return monthly values (defalt: False)
+                            end month - YYYY-MM (default: None)
+      --monthly             return monthly values (default: False)
 
 
 Same as ``condastats overall``, we can specify a month, or provide the
@@ -296,9 +296,9 @@ Here are the function signatures for these five functions:
 .. parsed-literal::
 
     Help on function overall in module condastats.cli:
-    
+
     overall(package, month=None, start_month=None, end_month=None, monthly=False, pkg_platform=None, data_source=None, pkg_version=None, pkg_python=None)
-    
+
 
 
 .. code:: python
@@ -309,9 +309,9 @@ Here are the function signatures for these five functions:
 .. parsed-literal::
 
     Help on function pkg_platform in module condastats.cli:
-    
+
     pkg_platform(package, month=None, start_month=None, end_month=None, monthly=False)
-    
+
 
 
 .. code:: python
@@ -322,9 +322,9 @@ Here are the function signatures for these five functions:
 .. parsed-literal::
 
     Help on function pkg_version in module condastats.cli:
-    
+
     pkg_version(package, month=None, start_month=None, end_month=None, monthly=False)
-    
+
 
 
 .. code:: python
@@ -335,9 +335,9 @@ Here are the function signatures for these five functions:
 .. parsed-literal::
 
     Help on function pkg_python in module condastats.cli:
-    
+
     pkg_python(package, month=None, start_month=None, end_month=None, monthly=False)
-    
+
 
 
 .. code:: python
@@ -348,9 +348,9 @@ Here are the function signatures for these five functions:
 .. parsed-literal::
 
     Help on function data_source in module condastats.cli:
-    
+
     data_source(package, month=None, start_month=None, end_month=None, monthly=False)
-    
+
 
 
 Similar to command line interface, we can get the total package download
