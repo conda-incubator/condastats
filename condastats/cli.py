@@ -11,8 +11,13 @@ from typing import Union, List, Tuple, Optional
 
 pd.set_option("display.max_rows", None)
 
-# Configure string type for pyarrow
-STRING_TYPE = pa.string()
+def _convert_string_columns(df):
+    """Convert string columns to pandas string type after reading."""
+    string_columns = ["pkg_name", "pkg_platform", "data_source", "pkg_version", "pkg_python"]
+    for col in string_columns:
+        if col in df.columns:
+            df[col] = df[col].astype(str)
+    return df
 
 def overall(
     package: Union[str, List[str], Tuple[str, ...]],
@@ -42,15 +47,7 @@ def overall(
         df = dd.read_parquet(
             f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
             storage_options={"anon": True},
-            engine="pyarrow",
-            dtype_backend="pyarrow",
-            dtype={
-                "pkg_name": "string[pyarrow]",
-                "pkg_platform": "string[pyarrow]",
-                "data_source": "string[pyarrow]",
-                "pkg_version": "string[pyarrow]",
-                "pkg_python": "string[pyarrow]",
-            }
+            engine="pyarrow"
         )
         df = df.query(f'pkg_name in ("{package}")')
 
@@ -74,21 +71,14 @@ def overall(
         df = dd.read_parquet(
             "s3://anaconda-package-data/conda/monthly/*/*.parquet",
             storage_options={"anon": True},
-            engine="pyarrow",
-            dtype_backend="pyarrow",
-            dtype={
-                "pkg_name": "string[pyarrow]",
-                "pkg_platform": "string[pyarrow]",
-                "data_source": "string[pyarrow]",
-                "pkg_version": "string[pyarrow]",
-                "pkg_python": "string[pyarrow]",
-            }
+            engine="pyarrow"
         )
         df = df.query(f'pkg_name in ("{package}")')
 
     if complete:
         df = df.compute()
-        df["pkg_name"] = df["pkg_name"].cat.remove_unused_categories()
+        df = _convert_string_columns(df)
+        df["pkg_name"] = df["pkg_name"].astype("category")
         return df
 
     # subset data based on other conditions if given
@@ -105,7 +95,8 @@ def overall(
         df = df.query(" and ".join(queries))
 
     df = df.compute()
-    df["pkg_name"] = df["pkg_name"].cat.remove_unused_categories()
+    df = _convert_string_columns(df)
+    df["pkg_name"] = df["pkg_name"].astype("category")
 
     # if monthly, return monthly counts
     if monthly:
@@ -139,15 +130,7 @@ def _groupby(
             f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
             columns=["time", "pkg_name", column, "counts"],
             storage_options={"anon": True},
-            engine="pyarrow",
-            dtype_backend="pyarrow",
-            dtype={
-                "pkg_name": "string[pyarrow]",
-                "pkg_platform": "string[pyarrow]",
-                "data_source": "string[pyarrow]",
-                "pkg_version": "string[pyarrow]",
-                "pkg_python": "string[pyarrow]",
-            }
+            engine="pyarrow"
         )
         df = df.query(f'pkg_name in ("{package}")')
 
@@ -164,15 +147,7 @@ def _groupby(
             file_list,
             columns=["time", "pkg_name", column, "counts"],
             storage_options={"anon": True},
-            engine="pyarrow",
-            dtype_backend="pyarrow",
-            dtype={
-                "pkg_name": "string[pyarrow]",
-                "pkg_platform": "string[pyarrow]",
-                "data_source": "string[pyarrow]",
-                "pkg_version": "string[pyarrow]",
-                "pkg_python": "string[pyarrow]",
-            }
+            engine="pyarrow"
         )
         df = df.query(f'pkg_name in ("{package}")')
 
@@ -183,21 +158,14 @@ def _groupby(
             f"s3://anaconda-package-data/conda/monthly/*/*.parquet",
             columns=["time", "pkg_name", column, "counts"],
             storage_options={"anon": True},
-            engine="pyarrow",
-            dtype_backend="pyarrow",
-            dtype={
-                "pkg_name": "string[pyarrow]",
-                "pkg_platform": "string[pyarrow]",
-                "data_source": "string[pyarrow]",
-                "pkg_version": "string[pyarrow]",
-                "pkg_python": "string[pyarrow]",
-            }
+            engine="pyarrow"
         )
         df = df.query(f'pkg_name in ("{package}")')
 
     df = df.compute()
-    df["pkg_name"] = df["pkg_name"].cat.remove_unused_categories()
-    df[column] = df[column].cat.remove_unused_categories()
+    df = _convert_string_columns(df)
+    df["pkg_name"] = df["pkg_name"].astype("category")
+    df[column] = df[column].astype("category")
 
     # if monthly, return monthly counts
     if monthly:
