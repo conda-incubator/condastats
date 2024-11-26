@@ -40,14 +40,15 @@ test:
     - pytest
 
 about:
-  home: https://github.com/sophiamyang/condastats
+  home: https://github.com/conda-incuabtor/condastats
   license: BSD
   license_family: BSD
-  license_file: 
+  license_file:
   summary: Conda package stats CLI
-  doc_url: 
-  dev_url: 
+  doc_url:
+  dev_url:
 
 extra:
   recipe-maintainers:
     - sophiamyang
+    - jezdez

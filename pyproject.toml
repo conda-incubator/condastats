@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools-scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "condastats"
+description = "Conda package stats CLI"
+readme = "README.rst"
+requires-python = ">=3.8"
+license = {text = "BSD license"}
+authors = [
+    {name = "Sophia Man Yang"}
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dynamic = ["version"]
+dependencies = [
+    "numpy>=1.16.5",
+    "dask[dataframe]",
+    "pyarrow",
+    "s3fs",
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
+doc = [
+    "dask",
+    "intake",
+    "numpy>=1.16.5",
+    "pandas",
+    "requests",
+    "ipython"
+]
+readthedocs = [
+    "python-snappy",
+]
+
+
+[project.urls]
+Homepage = "https://github.com/conda-incubator/condastats"
+
+[project.scripts]
+condastats = "condastats.cli:main"
+
+[tool.setuptools]
+packages = ["condastats"]
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools_scm]
+write_to = "condastats/_version.py"
+version_scheme = "post-release"

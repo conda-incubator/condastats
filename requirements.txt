@@ -1,8 +1,0 @@
-dask
-intake
-numpy>=1.16.5
-pandas
-requests
-ipython
-
-
