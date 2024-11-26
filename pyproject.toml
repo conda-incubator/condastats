@@ -32,7 +32,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest"]
 doc = [
     "dask",
     "intake",
