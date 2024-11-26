@@ -26,9 +26,10 @@ classifiers = [
 dynamic = ["version"]
 dependencies = [
     "numpy>=1.16.5",
-    "dask[dataframe]",
-    "pyarrow",
-    "s3fs",
+    "dask[dataframe]>=2023.3.0",
+    "pyarrow>=14.0.1",
+    "s3fs>=2023.3.0",
+    "pandas>=2.0.0",
 ]
 
 [project.optional-dependencies]

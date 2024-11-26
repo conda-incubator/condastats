@@ -6,7 +6,5 @@ def test_overall1():
     assert x.loc['dask'] == 221200
 
 def test_overall2():
-    x = overall('pandas',month='2019-01', pkg_platform='linux-32',data_source='anaconda',pkg_version='0.10.0',pkg_python=2.6)
+    x = overall('pandas',month='2019-01', pkg_platform='linux-32',data_source='anaconda',pkg_version='0.10.0',pkg_python='3.7')
     assert x.loc['pandas'] == 12
-
-

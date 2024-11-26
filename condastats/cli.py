@@ -4,24 +4,28 @@
 import sys
 import dask.dataframe as dd
 import pandas as pd
+import pyarrow as pa
 from datetime import datetime
 import argparse
+from typing import Union, List, Tuple, Optional
 
 pd.set_option("display.max_rows", None)
 
+# Configure string type for pyarrow
+STRING_TYPE = pa.string()
 
 def overall(
-    package,
-    month=None,
-    start_month=None,
-    end_month=None,
-    monthly=False,
-    complete=False,
-    pkg_platform=None,
-    data_source=None,
-    pkg_version=None,
-    pkg_python=None,
-):
+    package: Union[str, List[str], Tuple[str, ...]],
+    month: Optional[Union[str, datetime]] = None,
+    start_month: Optional[Union[str, datetime]] = None,
+    end_month: Optional[Union[str, datetime]] = None,
+    monthly: bool = False,
+    complete: bool = False,
+    pkg_platform: Optional[str] = None,
+    data_source: Optional[str] = None,
+    pkg_version: Optional[str] = None,
+    pkg_python: Optional[Union[str, float]] = None,
+) -> Union[pd.DataFrame, pd.Series]:
 
     # so we can pass in one or more packages
     # if more than one packages, e.g., ("pandas","dask") as a tuple or
@@ -38,7 +42,15 @@ def overall(
         df = dd.read_parquet(
             f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
             storage_options={"anon": True},
-            engine="pyarrow"
+            engine="pyarrow",
+            dtype_backend="pyarrow",
+            dtype={
+                "pkg_name": "string[pyarrow]",
+                "pkg_platform": "string[pyarrow]",
+                "data_source": "string[pyarrow]",
+                "pkg_version": "string[pyarrow]",
+                "pkg_python": "string[pyarrow]",
+            }
         )
         df = df.query(f'pkg_name in ("{package}")')
 
@@ -62,7 +74,15 @@ def overall(
         df = dd.read_parquet(
             "s3://anaconda-package-data/conda/monthly/*/*.parquet",
             storage_options={"anon": True},
-            engine="pyarrow"
+            engine="pyarrow",
+            dtype_backend="pyarrow",
+            dtype={
+                "pkg_name": "string[pyarrow]",
+                "pkg_platform": "string[pyarrow]",
+                "data_source": "string[pyarrow]",
+                "pkg_version": "string[pyarrow]",
+                "pkg_python": "string[pyarrow]",
+            }
         )
         df = df.query(f'pkg_name in ("{package}")')
 
@@ -99,7 +119,14 @@ def overall(
         return total_counts
 
 
-def _groupby(package, column, month, start_month, end_month, monthly):
+def _groupby(
+    package: Union[str, List[str], Tuple[str, ...]],
+    column: str,
+    month: Optional[Union[str, datetime]] = None,
+    start_month: Optional[Union[str, datetime]] = None,
+    end_month: Optional[Union[str, datetime]] = None,
+    monthly: bool = False,
+) -> pd.Series:
 
     if isinstance(package, tuple) or isinstance(package, list):
         package = '","'.join(package)
@@ -112,7 +139,15 @@ def _groupby(package, column, month, start_month, end_month, monthly):
             f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
             columns=["time", "pkg_name", column, "counts"],
             storage_options={"anon": True},
-            engine="pyarrow"
+            engine="pyarrow",
+            dtype_backend="pyarrow",
+            dtype={
+                "pkg_name": "string[pyarrow]",
+                "pkg_platform": "string[pyarrow]",
+                "data_source": "string[pyarrow]",
+                "pkg_version": "string[pyarrow]",
+                "pkg_python": "string[pyarrow]",
+            }
         )
         df = df.query(f'pkg_name in ("{package}")')
 
@@ -129,7 +164,15 @@ def _groupby(package, column, month, start_month, end_month, monthly):
             file_list,
             columns=["time", "pkg_name", column, "counts"],
             storage_options={"anon": True},
-            engine="pyarrow"
+            engine="pyarrow",
+            dtype_backend="pyarrow",
+            dtype={
+                "pkg_name": "string[pyarrow]",
+                "pkg_platform": "string[pyarrow]",
+                "data_source": "string[pyarrow]",
+                "pkg_version": "string[pyarrow]",
+                "pkg_python": "string[pyarrow]",
+            }
         )
         df = df.query(f'pkg_name in ("{package}")')
 
@@ -140,7 +183,15 @@ def _groupby(package, column, month, start_month, end_month, monthly):
             f"s3://anaconda-package-data/conda/monthly/*/*.parquet",
             columns=["time", "pkg_name", column, "counts"],
             storage_options={"anon": True},
-            engine="pyarrow"
+            engine="pyarrow",
+            dtype_backend="pyarrow",
+            dtype={
+                "pkg_name": "string[pyarrow]",
+                "pkg_platform": "string[pyarrow]",
+                "data_source": "string[pyarrow]",
+                "pkg_version": "string[pyarrow]",
+                "pkg_python": "string[pyarrow]",
+            }
         )
         df = df.query(f'pkg_name in ("{package}")')
 
@@ -159,32 +210,48 @@ def _groupby(package, column, month, start_month, end_month, monthly):
 
 
 def pkg_platform(
-    package, month=None, start_month=None, end_month=None, monthly=False
-):
+    package: Union[str, List[str], Tuple[str, ...]],
+    month: Optional[Union[str, datetime]] = None,
+    start_month: Optional[Union[str, datetime]] = None,
+    end_month: Optional[Union[str, datetime]] = None,
+    monthly: bool = False,
+) -> pd.Series:
     return _groupby(
         package, "pkg_platform", month, start_month, end_month, monthly
     )
 
 
 def data_source(
-    package, month=None, start_month=None, end_month=None, monthly=False
-):
+    package: Union[str, List[str], Tuple[str, ...]],
+    month: Optional[Union[str, datetime]] = None,
+    start_month: Optional[Union[str, datetime]] = None,
+    end_month: Optional[Union[str, datetime]] = None,
+    monthly: bool = False,
+) -> pd.Series:
     return _groupby(
         package, "data_source", month, start_month, end_month, monthly
     )
 
 
 def pkg_version(
-    package, month=None, start_month=None, end_month=None, monthly=False
-):
+    package: Union[str, List[str], Tuple[str, ...]],
+    month: Optional[Union[str, datetime]] = None,
+    start_month: Optional[Union[str, datetime]] = None,
+    end_month: Optional[Union[str, datetime]] = None,
+    monthly: bool = False,
+) -> pd.Series:
     return _groupby(
         package, "pkg_version", month, start_month, end_month, monthly
     )
 
 
 def pkg_python(
-    package, month=None, start_month=None, end_month=None, monthly=False
-):
+    package: Union[str, List[str], Tuple[str, ...]],
+    month: Optional[Union[str, datetime]] = None,
+    start_month: Optional[Union[str, datetime]] = None,
+    end_month: Optional[Union[str, datetime]] = None,
+    monthly: bool = False,
+) -> pd.Series:
     return _groupby(
         package, "pkg_python", month, start_month, end_month, monthly
     )
