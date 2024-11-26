@@ -16,7 +16,8 @@ def _convert_string_columns(df):
     string_columns = ["pkg_name", "pkg_platform", "data_source", "pkg_version", "pkg_python"]
     for col in string_columns:
         if col in df.columns:
-            df[col] = df[col].astype(str)
+            if df[col].dtype == "object":
+                df[col] = df[col].astype(str)
     return df
 
 def overall(
@@ -78,7 +79,6 @@ def overall(
     if complete:
         df = df.compute()
         df = _convert_string_columns(df)
-        df["pkg_name"] = df["pkg_name"].astype("category")
         return df
 
     # subset data based on other conditions if given
@@ -96,17 +96,16 @@ def overall(
 
     df = df.compute()
     df = _convert_string_columns(df)
-    df["pkg_name"] = df["pkg_name"].astype("category")
 
     # if monthly, return monthly counts
     if monthly:
         monthly_counts = (
-            df.groupby(["pkg_name", "time"]).counts.sum()
+            df.groupby(["pkg_name", "time"], observed=True).counts.sum()
         )
         return monthly_counts
     # return sum of all counts
     else:
-        total_counts = (df.groupby("pkg_name").counts.sum())
+        total_counts = df.groupby("pkg_name", observed=True).counts.sum()
         return total_counts
 
 
@@ -164,15 +163,13 @@ def _groupby(
 
     df = df.compute()
     df = _convert_string_columns(df)
-    df["pkg_name"] = df["pkg_name"].astype("category")
-    df[column] = df[column].astype("category")
 
     # if monthly, return monthly counts
     if monthly:
-        agg = df.groupby(["pkg_name", "time", column]).counts.sum()
+        agg = df.groupby(["pkg_name", "time", column], observed=True).counts.sum()
     # return sum of all counts
     else:
-        agg = df.groupby(["pkg_name", column]).counts.sum()
+        agg = df.groupby(["pkg_name", column], observed=True).counts.sum()
 
     return agg
 
