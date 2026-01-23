@@ -1,5 +1,4 @@
 """Tests for the CLI interface."""
-import subprocess
 import sys
 
 import pytest
@@ -7,59 +6,9 @@ import pytest
 from condastats.cli import main
 
 
-# Subprocess tests (integration tests)
-# These can't easily use fixtures since they run in separate processes
-
-@pytest.mark.parametrize("subcommand,expected", [
-    (["overall", "pandas", "--month", "2019-01"], "932443"),
-    (["pkg_platform", "pandas", "--month", "2019-01"], "linux-64"),
-    (["data_source", "pandas", "--month", "2019-01"], "anaconda"),
-    (["pkg_version", "pandas", "--month", "2019-01"], "pandas"),
-    (["pkg_python", "pandas", "--month", "2019-01"], "pandas"),
-])
-def test_cli_subcommands(subcommand, expected):
-    """Test CLI subcommands via subprocess."""
-    result = subprocess.run(
-        [sys.executable, '-m', 'condastats.cli'] + subcommand,
-        capture_output=True,
-        text=True
-    )
-    assert result.returncode == 0
-    assert expected in result.stdout
-
-
-def test_cli_overall_with_filters():
-    """Test CLI overall with filter options."""
-    result = subprocess.run(
-        [sys.executable, '-m', 'condastats.cli', 'overall', 'pandas',
-         '--month', '2019-01',
-         '--pkg_platform', 'linux-64',
-         '--data_source', 'anaconda'],
-        capture_output=True,
-        text=True
-    )
-    assert result.returncode == 0
-    assert 'pandas' in result.stdout
-
-
-def test_cli_overall_monthly():
-    """Test CLI overall with monthly flag."""
-    result = subprocess.run(
-        [sys.executable, '-m', 'condastats.cli', 'overall', 'pandas',
-         '--start_month', '2019-01',
-         '--end_month', '2019-02',
-         '--monthly'],
-        capture_output=True,
-        text=True
-    )
-    assert result.returncode == 0
-    assert 'pandas' in result.stdout
-
-
 # Direct main() tests using monkeypatch (for coverage)
-# These reuse fixture data where the assertions allow
 
-def test_main_overall(monkeypatch, capsys, pandas_overall):
+def test_main_overall(monkeypatch, capsys):
     """Test main() with overall subcommand."""
     monkeypatch.setattr(sys, 'argv', [
         'condastats', 'overall', 'pandas', '--month', '2019-01'

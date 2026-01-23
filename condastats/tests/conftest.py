@@ -1,7 +1,7 @@
 """Pytest configuration and shared fixtures.
 
 Session-scoped fixtures fetch data once and reuse across all tests,
-significantly reducing test runtime by avoiding repeated S3 queries.
+reducing test runtime by avoiding repeated S3 queries.
 """
 import pytest
 
@@ -22,7 +22,7 @@ TEST_START_MONTH = '2019-01'
 TEST_END_MONTH = '2019-02'
 
 
-# Session-scoped fixtures for single month queries
+# Session-scoped fixtures for overall() tests
 
 @pytest.fixture(scope="session")
 def pandas_overall():
@@ -56,6 +56,25 @@ def pandas_overall_filtered():
 
 
 @pytest.fixture(scope="session")
+def pandas_overall_range():
+    """Overall stats for pandas across date range."""
+    return overall(TEST_PACKAGE, start_month=TEST_START_MONTH, end_month=TEST_END_MONTH)
+
+
+@pytest.fixture(scope="session")
+def pandas_overall_monthly():
+    """Monthly overall stats for pandas across date range."""
+    return overall(
+        TEST_PACKAGE,
+        start_month=TEST_START_MONTH,
+        end_month=TEST_END_MONTH,
+        monthly=True
+    )
+
+
+# Session-scoped fixtures for groupby tests
+
+@pytest.fixture(scope="session")
 def pandas_pkg_platform():
     """Platform breakdown for pandas in test month."""
     return pkg_platform(TEST_PACKAGE, month=TEST_MONTH)
@@ -68,6 +87,17 @@ def multi_package_pkg_platform():
 
 
 @pytest.fixture(scope="session")
+def pandas_pkg_platform_monthly():
+    """Monthly platform breakdown for pandas across date range."""
+    return pkg_platform(
+        TEST_PACKAGE,
+        start_month=TEST_START_MONTH,
+        end_month=TEST_END_MONTH,
+        monthly=True
+    )
+
+
+@pytest.fixture(scope="session")
 def pandas_data_source():
     """Data source breakdown for pandas in test month."""
     return data_source(TEST_PACKAGE, month=TEST_MONTH)
@@ -77,6 +107,17 @@ def pandas_data_source():
 def multi_package_data_source():
     """Data source breakdown for multiple packages in test month."""
     return data_source(TEST_PACKAGES, month=TEST_MONTH)
+
+
+@pytest.fixture(scope="session")
+def pandas_data_source_monthly():
+    """Monthly data source breakdown for pandas across date range."""
+    return data_source(
+        TEST_PACKAGE,
+        start_month=TEST_START_MONTH,
+        end_month=TEST_END_MONTH,
+        monthly=True
+    )
 
 
 @pytest.fixture(scope="session")
@@ -101,44 +142,3 @@ def pandas_pkg_python():
 def multi_package_pkg_python():
     """Python version breakdown for multiple packages in test month."""
     return pkg_python(TEST_PACKAGES, month=TEST_MONTH)
-
-
-# Session-scoped fixtures for date range queries
-
-@pytest.fixture(scope="session")
-def pandas_overall_range():
-    """Overall stats for pandas across date range."""
-    return overall(TEST_PACKAGE, start_month=TEST_START_MONTH, end_month=TEST_END_MONTH)
-
-
-@pytest.fixture(scope="session")
-def pandas_overall_monthly():
-    """Monthly overall stats for pandas across date range."""
-    return overall(
-        TEST_PACKAGE,
-        start_month=TEST_START_MONTH,
-        end_month=TEST_END_MONTH,
-        monthly=True
-    )
-
-
-@pytest.fixture(scope="session")
-def pandas_pkg_platform_monthly():
-    """Monthly platform breakdown for pandas across date range."""
-    return pkg_platform(
-        TEST_PACKAGE,
-        start_month=TEST_START_MONTH,
-        end_month=TEST_END_MONTH,
-        monthly=True
-    )
-
-
-@pytest.fixture(scope="session")
-def pandas_data_source_monthly():
-    """Monthly data source breakdown for pandas across date range."""
-    return data_source(
-        TEST_PACKAGE,
-        start_month=TEST_START_MONTH,
-        end_month=TEST_END_MONTH,
-        monthly=True
-    )
