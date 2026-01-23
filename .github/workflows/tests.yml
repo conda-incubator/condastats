@@ -32,7 +32,7 @@ jobs:
           miniforge-variant: Miniforge3
           miniforge-version: latest
           python-version: ${{ matrix.python-version }}
-          activate-environment: test
+          activate-environment: true
           channels: conda-forge
           channel-priority: strict
           use-mamba: true
