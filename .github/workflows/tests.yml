@@ -12,6 +12,9 @@ concurrency:
 jobs:
   test:
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash -el {0}' }}
     strategy:
       fail-fast: false
       matrix:
@@ -29,28 +32,13 @@ jobs:
           miniforge-variant: Miniforge3
           miniforge-version: latest
           python-version: ${{ matrix.python-version }}
+          activate-environment: test-env
           channels: conda-forge
           channel-priority: strict
           use-mamba: true
-      - name: Install dependencies (Unix)
-        if: runner.os != 'Windows'
-        shell: bash -el {0}
+      - name: Install dependencies
         run: |
           mamba install -y "numpy>=1.20.0" "pandas>=2.0.0" "dask>=2024.5.2" "pyarrow>=10.0.0" "s3fs>=2023.1.0" python-snappy pytest pytest-cov
           pip install -e . --no-deps
-      - name: Install dependencies (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          mamba install -y "numpy>=1.20.0" "pandas>=2.0.0" "dask>=2024.5.2" "pyarrow>=10.0.0" "s3fs>=2023.1.0" python-snappy pytest pytest-cov
-          pip install -e . --no-deps
-      - name: PyTest (Unix)
-        if: runner.os != 'Windows'
-        shell: bash -el {0}
-        run: |
-          pytest -v --cov=condastats --cov-report=term-missing
-      - name: PyTest (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          pytest -v --cov=condastats --cov-report=term-missing
+      - name: PyTest
+        run: pytest -v --cov=condastats --cov-report=term-missing
