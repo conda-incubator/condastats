@@ -11,5 +11,5 @@ To install condastats, run this command in your terminal:
     $ conda install -c conda-forge condastats
 
 
-.. _Github repo: https://github.com/sophiamyang/condastats
-.. _tarball: https://github.com/sophiamyang/condastats/tarball/master
+.. _Github repo: https://github.com/conda-incubator/condastats
+.. _tarball: https://github.com/conda-incubator/condastats/tarball/master

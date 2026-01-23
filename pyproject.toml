@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "condastats"
+dynamic = ["version"]
+description = "Conda package stats CLI"
+readme = "README.rst"
+license = "BSD-3-Clause"
+authors = [
+    {name = "Sophia Man Yang"}
+]
+keywords = ["condastats"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+requires-python = ">=3.10,<3.12"
+dependencies = [
+    "numpy>=1.16.5,<2.0.0",
+    "pandas>=1.5.0,<2.0.0",
+    "dask[dataframe]>=2023.1.0,<2024.3.0",
+    "pyarrow>=10.0.0,<15.0.0",
+    "s3fs>=2023.1.0",
+    "python-snappy",
+]
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-cov"]
+doc = ["sphinx"]
+
+[project.scripts]
+condastats = "condastats.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/conda-incubator/condastats"
+
+[tool.setuptools]
+packages = ["condastats"]
+
+[tool.setuptools_scm]

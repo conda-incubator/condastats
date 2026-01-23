@@ -12,6 +12,8 @@
 #
 import os
 import sys
+from importlib.metadata import version as get_version
+
 sys.path.insert(0, os.path.abspath('.'))
 
 
@@ -21,8 +23,8 @@ project = 'condastats'
 copyright = '2019, Sophia Man Yang'
 author = 'Sophia Man Yang'
 
-# The full version, including alpha/beta/rc tags
-# release = '0.1.0'
+release: str = get_version("condastats")
+version: str = ".".join(release.split('.')[:2])
 
 
 # -- General configuration ---------------------------------------------------

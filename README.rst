@@ -6,9 +6,6 @@ condastats
 .. image:: https://img.shields.io/pypi/v/condastats.svg
         :target: https://pypi.python.org/pypi/condastats
 
-.. image:: https://img.shields.io/travis/sophiamyang/condastats.svg
-        :target: https://travis-ci.org/sophiamyang/condastats
-
 .. image:: https://readthedocs.org/projects/condastats/badge/?version=latest
         :target: https://condastats.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status

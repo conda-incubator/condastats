@@ -1,27 +1,29 @@
 # -*- coding: utf-8 -*-
 
 """Console script for condastats."""
+import argparse
 import sys
+from datetime import datetime
+from typing import List, Optional, Tuple, Union
+
 import dask.dataframe as dd
 import pandas as pd
-from datetime import datetime
-import argparse
 
 pd.set_option("display.max_rows", None)
 
 
 def overall(
-    package,
-    month=None,
-    start_month=None,
-    end_month=None,
-    monthly=False,
-    complete=False,
-    pkg_platform=None,
-    data_source=None,
-    pkg_version=None,
-    pkg_python=None,
-):
+    package: Union[str, List[str], Tuple[str, ...]],
+    month: Optional[Union[str, datetime]] = None,
+    start_month: Optional[Union[str, datetime]] = None,
+    end_month: Optional[Union[str, datetime]] = None,
+    monthly: bool = False,
+    complete: bool = False,
+    pkg_platform: Optional[str] = None,
+    data_source: Optional[str] = None,
+    pkg_version: Optional[str] = None,
+    pkg_python: Optional[Union[str, float]] = None,
+) -> Union[pd.DataFrame, pd.Series]:
 
     # so we can pass in one or more packages
     # if more than one packages, e.g., ("pandas","dask") as a tuple or
@@ -90,16 +92,23 @@ def overall(
     # if monthly, return monthly counts
     if monthly:
         monthly_counts = (
-            df.groupby(["pkg_name", "time"]).counts.sum()
+            df.groupby(["pkg_name", "time"], observed=True).counts.sum()
         )
         return monthly_counts
     # return sum of all counts
     else:
-        total_counts = (df.groupby("pkg_name").counts.sum())
+        total_counts = df.groupby("pkg_name", observed=True).counts.sum()
         return total_counts
 
 
-def _groupby(package, column, month, start_month, end_month, monthly):
+def _groupby(
+    package: Union[str, List[str], Tuple[str, ...]],
+    column: str,
+    month: Optional[Union[str, datetime]] = None,
+    start_month: Optional[Union[str, datetime]] = None,
+    end_month: Optional[Union[str, datetime]] = None,
+    monthly: bool = False,
+) -> pd.Series:
 
     if isinstance(package, tuple) or isinstance(package, list):
         package = '","'.join(package)
@@ -150,41 +159,57 @@ def _groupby(package, column, month, start_month, end_month, monthly):
 
     # if monthly, return monthly counts
     if monthly:
-        agg = df.groupby(["pkg_name", "time", column]).counts.sum()
+        agg = df.groupby(["pkg_name", "time", column], observed=True).counts.sum()
     # return sum of all counts
     else:
-        agg = df.groupby(["pkg_name", column]).counts.sum()
+        agg = df.groupby(["pkg_name", column], observed=True).counts.sum()
 
     return agg
 
 
 def pkg_platform(
-    package, month=None, start_month=None, end_month=None, monthly=False
-):
+    package: Union[str, List[str], Tuple[str, ...]],
+    month: Optional[Union[str, datetime]] = None,
+    start_month: Optional[Union[str, datetime]] = None,
+    end_month: Optional[Union[str, datetime]] = None,
+    monthly: bool = False,
+) -> pd.Series:
     return _groupby(
         package, "pkg_platform", month, start_month, end_month, monthly
     )
 
 
 def data_source(
-    package, month=None, start_month=None, end_month=None, monthly=False
-):
+    package: Union[str, List[str], Tuple[str, ...]],
+    month: Optional[Union[str, datetime]] = None,
+    start_month: Optional[Union[str, datetime]] = None,
+    end_month: Optional[Union[str, datetime]] = None,
+    monthly: bool = False,
+) -> pd.Series:
     return _groupby(
         package, "data_source", month, start_month, end_month, monthly
     )
 
 
 def pkg_version(
-    package, month=None, start_month=None, end_month=None, monthly=False
-):
+    package: Union[str, List[str], Tuple[str, ...]],
+    month: Optional[Union[str, datetime]] = None,
+    start_month: Optional[Union[str, datetime]] = None,
+    end_month: Optional[Union[str, datetime]] = None,
+    monthly: bool = False,
+) -> pd.Series:
     return _groupby(
         package, "pkg_version", month, start_month, end_month, monthly
     )
 
 
 def pkg_python(
-    package, month=None, start_month=None, end_month=None, monthly=False
-):
+    package: Union[str, List[str], Tuple[str, ...]],
+    month: Optional[Union[str, datetime]] = None,
+    start_month: Optional[Union[str, datetime]] = None,
+    end_month: Optional[Union[str, datetime]] = None,
+    monthly: bool = False,
+) -> pd.Series:
     return _groupby(
         package, "pkg_python", month, start_month, end_month, monthly
     )

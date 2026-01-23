@@ -10,7 +10,7 @@ source:
   sha256: 1e719621391750d9752a0eb3cba4240463bb0a3681ad208a23c44197e38dec2e
 
 build:
-  noarch: generic
+  noarch: python
   number: 0
   entry_points:
     - condastats=condastats.cli:main
@@ -18,18 +18,22 @@ build:
 
 requirements:
   host:
-    - dask
-    - fastparquet
+    - dask >=2023.1.0,<2024.3.0
+    - numpy >=1.16.5,<2.0.0
+    - pandas >=1.5.0,<2.0.0
     - pip
-    - python
+    - pyarrow >=10.0.0,<15.0.0
+    - python >=3.10,<3.12
     - python-snappy
-    - s3fs
+    - s3fs >=2023.1.0
   run:
-    - dask
-    - fastparquet
-    - python
+    - dask >=2023.1.0,<2024.3.0
+    - numpy >=1.16.5,<2.0.0
+    - pandas >=1.5.0,<2.0.0
+    - pyarrow >=10.0.0,<15.0.0
+    - python >=3.10,<3.12
     - python-snappy
-    - s3fs
+    - s3fs >=2023.1.0
 
 test:
   imports:
@@ -40,7 +44,7 @@ test:
     - pytest
 
 about:
-  home: https://github.com/sophiamyang/condastats
+  home: https://github.com/conda-incubator/condastats
   license: BSD
   license_family: BSD
   license_file: 
