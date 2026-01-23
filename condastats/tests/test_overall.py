@@ -1,4 +1,6 @@
 """Tests for the overall() function."""
+import pytest
+
 from condastats.cli import overall
 
 
@@ -28,15 +30,13 @@ def test_with_all_filters():
     assert result.loc['pandas'] == 12
 
 
-def test_with_platform_filter():
-    """Test overall counts filtered by platform."""
-    result = overall('pandas', month='2019-01', pkg_platform='linux-64')
-    assert result.loc['pandas'] > 0
-
-
-def test_with_data_source_filter():
-    """Test overall counts filtered by data source."""
-    result = overall('pandas', month='2019-01', data_source='anaconda')
+@pytest.mark.parametrize("filter_name,filter_value", [
+    ("pkg_platform", "linux-64"),
+    ("data_source", "anaconda"),
+])
+def test_with_single_filter(filter_name, filter_value):
+    """Test overall counts with a single filter."""
+    result = overall('pandas', month='2019-01', **{filter_name: filter_value})
     assert result.loc['pandas'] > 0
 
 
@@ -57,6 +57,5 @@ def test_monthly_aggregation():
 def test_complete():
     """Test overall with complete=True returns full DataFrame."""
     result = overall('pandas', month='2019-01', complete=True)
-    # Should return a DataFrame, not a Series
     assert hasattr(result, 'columns')
     assert 'pkg_name' in result.columns
