@@ -43,10 +43,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix dask/pandas compatibility with Python 3.11 by using dask 2024.5.2+
-- Add `categories=[]` to read_parquet calls for pandas 2.x compatibility
+- Fix `TypeError: descriptor '__call__'` on Python 3.11+ by upgrading to dask 2024.5.2+
+- Fix `ValueError: Not all columns are categoricals` (#19) by adding `categories=[]` to read_parquet
+- Fix `ArrowStringArray requires PyArrow array of string type` (#17, #24) with modern dask/pandas/pyarrow
 - Update GitHub Actions to latest versions
 - Fix PyPI publish workflow to use supported Python version
+- Fix Windows CI environment activation
 
 ## [0.2.1] - Previous release
 
