@@ -1,8 +1,6 @@
-dask
-intake
 numpy>=1.16.5,<2.0.0
-pandas
-requests
-ipython
-
-
+pandas>=1.5.0,<2.0.0
+dask[dataframe]>=2023.1.0,<2024.3.0
+pyarrow>=10.0.0,<15.0.0
+s3fs>=2023.1.0
+python-snappy
