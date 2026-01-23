@@ -42,6 +42,7 @@ jobs:
           activate-environment: test-env
           channels: conda-forge
           channel-priority: strict
+          conda-remove-defaults: true
           pkgs-dirs: ~/conda_pkgs_dir
       - name: Enable sharded repodata
         run: |
