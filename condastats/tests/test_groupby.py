@@ -3,13 +3,19 @@ import pytest
 
 
 @pytest.mark.parametrize("fixture_name,column,expected_value", [
+    # pandas
     ("pandas_pkg_platform", "pkg_platform", "linux-64"),
     ("pandas_data_source", "data_source", "anaconda"),
     ("pandas_pkg_version", "pkg_version", None),
     ("pandas_pkg_python", "pkg_python", None),
+    # numpy
+    ("numpy_pkg_platform", "pkg_platform", "linux-64"),
+    ("numpy_data_source", "data_source", "anaconda"),
+    ("numpy_pkg_version", "pkg_version", None),
+    ("numpy_pkg_python", "pkg_python", None),
 ])
 def test_single_package(fixture_name, column, expected_value, request):
-    """Test groupby breakdown for a single package."""
+    """Test groupby breakdown for individual packages."""
     result = request.getfixturevalue(fixture_name)
     assert len(result) > 1
     values = result.index.get_level_values(column).unique()
@@ -30,7 +36,7 @@ def test_multiple_packages(fixture_name, request):
     result = request.getfixturevalue(fixture_name)
     packages = result.index.get_level_values('pkg_name').unique()
     assert 'pandas' in packages
-    assert 'dask' in packages
+    assert 'numpy' in packages
 
 
 @pytest.mark.parametrize("fixture_name", [
