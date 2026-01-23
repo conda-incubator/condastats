@@ -9,7 +9,7 @@ with open('README.rst') as readme_file:
     readme = readme_file.read()
 
 requirements = [
-    'numpy>=1.16.5',
+    'numpy>=1.16.5,<2.0.0',
     'pandas>=1.5.0,<2.0.0',  # pandas 2.x has incompatibility with legacy S3 parquet files
     'dask[dataframe]>=2023.1.0,<2024.3.0',  # dask 2024.3+ requires pandas 2.x
     'pyarrow>=10.0.0,<15.0.0',  # pyarrow 10-14 works with pandas 1.x and legacy parquet

@@ -1,6 +1,6 @@
 dask
 intake
-numpy>=1.16.5
+numpy>=1.16.5,<2.0.0
 pandas
 requests
 ipython
