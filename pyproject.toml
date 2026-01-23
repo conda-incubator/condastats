@@ -32,7 +32,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest"]
+test = ["pytest", "pytest-cov"]
+doc = ["sphinx"]
 
 [project.scripts]
 condastats = "condastats.cli:main"
