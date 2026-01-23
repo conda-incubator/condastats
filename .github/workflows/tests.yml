@@ -28,6 +28,12 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+      - name: Cache conda pkgs
+        uses: actions/cache@v4
+        with:
+          enableCrossOsArchive: true
+          path: ${{ runner.os == 'Windows' && 'D:\conda_pkgs_dir' || '~/conda_pkgs_dir' }}
+          key: pkgs-${{ runner.os }}-${{ runner.arch }}-${{ env.CACHE_NUMBER }}
       - name: Setup Conda
         uses: conda-incubator/setup-miniconda@v3
         with:
@@ -37,25 +43,14 @@ jobs:
           activate-environment: test-env
           channels: conda-forge
           channel-priority: strict
-      - name: Get cache date
-        id: get-date
-        shell: bash
-        run: echo "today=$(/bin/date -u '+%Y%W')" >> $GITHUB_OUTPUT
-      - name: Cache conda env
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.CONDA }}/envs
-          key: conda-${{ runner.os }}-${{ runner.arch }}-py${{ matrix.python-version }}-${{ steps.get-date.outputs.today }}-${{ env.CACHE_NUMBER }}
-        id: cache
+          pkgs-dirs: ${{ runner.os == 'Windows' && 'D:\conda_pkgs_dir' || '~/conda_pkgs_dir' }}
       - name: Enable sharded repodata
         run: |
           conda install -n base -y "conda-libmamba-solver>=25.11.0"
           conda config --set plugins.use_sharded_repodata true
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           conda install -y "numpy>=1.20.0" "pandas>=2.0.0" "dask>=2024.5.2" "pyarrow>=10.0.0" "s3fs>=2023.1.0" python-snappy pytest pytest-cov
-      - name: Install package
-        run: pip install -e . --no-deps
+          pip install -e . --no-deps
       - name: PyTest
         run: pytest -v --cov=condastats --cov-report=term-missing
