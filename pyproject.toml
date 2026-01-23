@@ -40,7 +40,7 @@ test = ["pytest"]
 condastats = "condastats.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/sophiamyang/condastats"
+Homepage = "https://github.com/conda-incubator/condastats"
 
 [tool.setuptools]
 packages = ["condastats"]

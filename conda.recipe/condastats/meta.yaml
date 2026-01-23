@@ -44,7 +44,7 @@ test:
     - pytest
 
 about:
-  home: https://github.com/sophiamyang/condastats
+  home: https://github.com/conda-incubator/condastats
   license: BSD
   license_family: BSD
   license_file: 

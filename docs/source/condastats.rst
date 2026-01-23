@@ -2,7 +2,7 @@
 condastats
 ============
 
-`condastats <https://github.com/sophiamyang/condastats>`__ is a conda
+`condastats <https://github.com/conda-incubator/condastats>`__ is a conda
 statistics API with Python interface and Command Line interface. This
 project is inspired by
 `pypistats <https://pypi.org/project/pypistats/>`__, which is a
@@ -460,8 +460,8 @@ two examples with pkg_python:
 
 Hope you find ``condastats`` useful! If you have any requests or issues,
 please open `an
-issue <https://github.com/sophiamyang/condastats/issues>`__ or `a pull
-request <https://github.com/sophiamyang/condastats/pulls>`__. If you
+issue <https://github.com/conda-incubator/condastats/issues>`__ or `a pull
+request <https://github.com/conda-incubator/condastats/pulls>`__. If you
 have any questions regarding the Anaconda public dataset, please check
 out https://github.com/ContinuumIO/anaconda-package-data and open an
 issue there.
