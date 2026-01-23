@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest", "macos-latest", "windows-latest"]
-        python-version: ["3.10", "3.11"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -28,9 +28,12 @@ jobs:
           python-version: ${{ matrix.python-version }}
           activate-environment: testing
           use-mamba: true
+          auto-activate-base: false
+          conda-remove-defaults: true
+          channel-priority: strict
       - name: Install dependencies
         run: |
-          mamba install "numpy>=1.16.5,<2.0.0" "pandas>=1.5.0,<2.0.0" "dask>=2023.1.0,<2024.3.0" "pyarrow>=10.0.0,<15.0.0" "s3fs>=2023.1.0" python-snappy pytest pytest-cov
+          mamba install "numpy>=1.20.0" "pandas>=2.0.0" "dask>=2024.5.2" "pyarrow>=10.0.0" "s3fs>=2023.1.0" python-snappy pytest pytest-cov
           pip install -e . --no-deps
       - name: PyTest
         run: |

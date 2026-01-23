@@ -40,7 +40,8 @@ def overall(
         df = dd.read_parquet(
             f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
             storage_options={"anon": True},
-            engine="pyarrow"
+            engine="pyarrow",
+            categories=[],
         )
         df = df.query(f'pkg_name in ("{package}")')
 
@@ -53,7 +54,7 @@ def overall(
             file_list.append(
                 f"s3://anaconda-package-data/conda/monthly/{month_i.year}/{month_i}.parquet"
             )
-        df = dd.read_parquet(file_list, storage_options={"anon": True}, engine="pyarrow")
+        df = dd.read_parquet(file_list, storage_options={"anon": True}, engine="pyarrow", categories=[])
         df = df.query(f'pkg_name in ("{package}")')
 
     # if all optional arguments are None, read in all
@@ -64,13 +65,15 @@ def overall(
         df = dd.read_parquet(
             "s3://anaconda-package-data/conda/monthly/*/*.parquet",
             storage_options={"anon": True},
-            engine="pyarrow"
+            engine="pyarrow",
+            categories=[],
         )
         df = df.query(f'pkg_name in ("{package}")')
 
     if complete:
         df = df.compute()
-        df["pkg_name"] = df["pkg_name"].cat.remove_unused_categories()
+        if hasattr(df["pkg_name"], "cat"):
+            df["pkg_name"] = df["pkg_name"].cat.remove_unused_categories()
         return df
 
     # subset data based on other conditions if given
@@ -87,13 +90,12 @@ def overall(
         df = df.query(" and ".join(queries))
 
     df = df.compute()
-    df["pkg_name"] = df["pkg_name"].cat.remove_unused_categories()
+    if hasattr(df["pkg_name"], "cat"):
+        df["pkg_name"] = df["pkg_name"].cat.remove_unused_categories()
 
     # if monthly, return monthly counts
     if monthly:
-        monthly_counts = (
-            df.groupby(["pkg_name", "time"], observed=True).counts.sum()
-        )
+        monthly_counts = df.groupby(["pkg_name", "time"], observed=True).counts.sum()
         return monthly_counts
     # return sum of all counts
     else:
@@ -121,7 +123,8 @@ def _groupby(
             f's3://anaconda-package-data/conda/monthly/{month.year}/{month.year}-{month.strftime("%m")}.parquet',
             columns=["time", "pkg_name", column, "counts"],
             storage_options={"anon": True},
-            engine="pyarrow"
+            engine="pyarrow",
+            categories=[],
         )
         df = df.query(f'pkg_name in ("{package}")')
 
@@ -138,7 +141,8 @@ def _groupby(
             file_list,
             columns=["time", "pkg_name", column, "counts"],
             storage_options={"anon": True},
-            engine="pyarrow"
+            engine="pyarrow",
+            categories=[],
         )
         df = df.query(f'pkg_name in ("{package}")')
 
@@ -149,13 +153,16 @@ def _groupby(
             f"s3://anaconda-package-data/conda/monthly/*/*.parquet",
             columns=["time", "pkg_name", column, "counts"],
             storage_options={"anon": True},
-            engine="pyarrow"
+            engine="pyarrow",
+            categories=[],
         )
         df = df.query(f'pkg_name in ("{package}")')
 
     df = df.compute()
-    df["pkg_name"] = df["pkg_name"].cat.remove_unused_categories()
-    df[column] = df[column].cat.remove_unused_categories()
+    if hasattr(df["pkg_name"], "cat"):
+        df["pkg_name"] = df["pkg_name"].cat.remove_unused_categories()
+    if hasattr(df[column], "cat"):
+        df[column] = df[column].cat.remove_unused_categories()
 
     # if monthly, return monthly counts
     if monthly:
