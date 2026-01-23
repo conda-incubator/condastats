@@ -27,6 +27,8 @@ jobs:
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
           channels: conda-forge
+          channel-priority: strict
+          conda-remove-defaults: true
           activate-environment: testing
       - name: Install dependencies
         run: |
