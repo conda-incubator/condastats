@@ -7,7 +7,7 @@ name = "condastats"
 dynamic = ["version"]
 description = "Conda package stats CLI"
 readme = "README.rst"
-license = {text = "BSD license"}
+license = "BSD-3-Clause"
 authors = [
     {name = "Sophia Man Yang"}
 ]
@@ -15,7 +15,6 @@ keywords = ["condastats"]
 classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: BSD License",
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
