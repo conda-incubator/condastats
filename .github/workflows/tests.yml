@@ -12,9 +12,6 @@ concurrency:
 jobs:
   test:
     runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash -el {0}
     strategy:
       fail-fast: false
       matrix:
@@ -35,10 +32,25 @@ jobs:
           channels: conda-forge
           channel-priority: strict
           use-mamba: true
-      - name: Install dependencies
+      - name: Install dependencies (Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
         run: |
           mamba install -y "numpy>=1.20.0" "pandas>=2.0.0" "dask>=2024.5.2" "pyarrow>=10.0.0" "s3fs>=2023.1.0" python-snappy pytest pytest-cov
           pip install -e . --no-deps
-      - name: PyTest
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          mamba install -y "numpy>=1.20.0" "pandas>=2.0.0" "dask>=2024.5.2" "pyarrow>=10.0.0" "s3fs>=2023.1.0" python-snappy pytest pytest-cov
+          pip install -e . --no-deps
+      - name: PyTest (Unix)
+        if: runner.os != 'Windows'
+        shell: bash -el {0}
+        run: |
+          pytest -v --cov=condastats --cov-report=term-missing
+      - name: PyTest (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
         run: |
           pytest -v --cov=condastats --cov-report=term-missing
