@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Breaking Changes
 
 - Drop Python 3.8 and 3.9 support; now requires Python 3.10 or 3.11
+- **Note**: pip installation only works reliably on Python 3.10; use conda for Python 3.11
 - Pin dependency versions for compatibility with legacy S3 parquet files:
   - `numpy>=1.16.5,<2.0.0`
   - `pandas>=1.5.0,<2.0.0`
