@@ -10,7 +10,7 @@ source:
   sha256: 1e719621391750d9752a0eb3cba4240463bb0a3681ad208a23c44197e38dec2e
 
 build:
-  noarch: generic
+  noarch: python
   number: 0
   entry_points:
     - condastats=condastats.cli:main
@@ -19,16 +19,16 @@ build:
 requirements:
   host:
     - dask
-    - fastparquet
     - pip
-    - python
+    - python >=3.10
     - python-snappy
+    - pyarrow >=10.0.0,<15.0.0
     - s3fs
   run:
     - dask
-    - fastparquet
-    - python
+    - python >=3.10
     - python-snappy
+    - pyarrow >=10.0.0,<15.0.0
     - s3fs
 
 test:
