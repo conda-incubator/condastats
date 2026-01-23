@@ -5,33 +5,52 @@ on:
   push:
     branches: [ main ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
     defaults:
       run:
-        shell: bash -l {0}
+        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash -el {0}' }}
     strategy:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest", "macos-latest", "windows-latest"]
-        python-version: ["3.10", "3.11"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    timeout-minutes: 30
+    env:
+      CACHE_NUMBER: 0  # Increase to reset cache
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+      - name: Cache conda pkgs
+        uses: actions/cache@v4
+        with:
+          path: ~/conda_pkgs_dir
+          key: pkgs-${{ runner.os }}-${{ runner.arch }}-${{ env.CACHE_NUMBER }}
       - name: Setup Conda
         uses: conda-incubator/setup-miniconda@v3
         with:
+          miniforge-variant: Miniforge3
           miniforge-version: latest
           python-version: ${{ matrix.python-version }}
-          activate-environment: testing
-          use-mamba: true
+          activate-environment: test-env
+          channels: conda-forge
+          channel-priority: strict
+          conda-remove-defaults: true
+          pkgs-dirs: ~/conda_pkgs_dir
+      - name: Enable sharded repodata
+        run: |
+          conda install -n base -y "conda-libmamba-solver>=25.11.0"
+          conda config --set plugins.use_sharded_repodata true
       - name: Install dependencies
         run: |
-          mamba install "numpy>=1.16.5,<2.0.0" "pandas>=1.5.0,<2.0.0" "dask>=2023.1.0,<2024.3.0" "pyarrow>=10.0.0,<15.0.0" "s3fs>=2023.1.0" python-snappy pytest pytest-cov
+          conda install -y "numpy>=1.20.0" "pandas>=2.0.0" "dask>=2024.5.2" "pyarrow>=10.0.0" "s3fs>=2023.1.0" python-snappy pytest pytest-cov
           pip install -e . --no-deps
       - name: PyTest
-        run: |
-          pytest -v --cov=condastats --cov-report=term-missing
+        run: pytest -v --cov=condastats --cov-report=term-missing
