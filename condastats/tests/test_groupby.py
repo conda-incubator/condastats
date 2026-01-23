@@ -1,37 +1,67 @@
 """Tests for groupby functions: pkg_platform, pkg_version, pkg_python, data_source."""
 import pytest
 
-from condastats.cli import pkg_platform, pkg_version, pkg_python, data_source
+
+def test_pkg_platform_single_package(pandas_pkg_platform):
+    """Test platform breakdown for a single package."""
+    assert len(pandas_pkg_platform) > 1
+    platforms = pandas_pkg_platform.index.get_level_values('pkg_platform').unique()
+    assert 'linux-64' in platforms
 
 
-@pytest.mark.parametrize("func,column,expected_value", [
-    (pkg_platform, "pkg_platform", "linux-64"),
-    (data_source, "data_source", "anaconda"),
-    (pkg_version, "pkg_version", None),  # Just check multiple versions exist
-    (pkg_python, "pkg_python", None),  # Just check multiple versions exist
-])
-def test_single_package(func, column, expected_value):
-    """Test groupby breakdown for a single package."""
-    result = func('pandas', month='2019-01')
-    assert len(result) > 1
-    values = result.index.get_level_values(column).unique()
-    if expected_value:
-        assert expected_value in values
-    else:
-        assert len(values) > 1
-
-
-@pytest.mark.parametrize("func", [pkg_platform, data_source, pkg_version, pkg_python])
-def test_multiple_packages(func):
-    """Test groupby breakdown for multiple packages."""
-    result = func(['pandas', 'dask'], month='2019-01')
-    packages = result.index.get_level_values('pkg_name').unique()
+def test_pkg_platform_multiple_packages(multi_package_pkg_platform):
+    """Test platform breakdown for multiple packages."""
+    packages = multi_package_pkg_platform.index.get_level_values('pkg_name').unique()
     assert 'pandas' in packages
     assert 'dask' in packages
 
 
-@pytest.mark.parametrize("func", [pkg_platform, data_source])
-def test_monthly_aggregation(func):
-    """Test groupby with monthly aggregation."""
-    result = func('pandas', start_month='2019-01', end_month='2019-02', monthly=True)
-    assert result.index.nlevels == 3  # pkg_name, time, column
+def test_pkg_platform_monthly(pandas_pkg_platform_monthly):
+    """Test platform breakdown with monthly aggregation."""
+    assert pandas_pkg_platform_monthly.index.nlevels == 3
+
+
+def test_data_source_single_package(pandas_data_source):
+    """Test data source breakdown for a single package."""
+    sources = pandas_data_source.index.get_level_values('data_source').unique()
+    assert 'anaconda' in sources
+
+
+def test_data_source_multiple_packages(multi_package_data_source):
+    """Test data source breakdown for multiple packages."""
+    packages = multi_package_data_source.index.get_level_values('pkg_name').unique()
+    assert 'pandas' in packages
+    assert 'dask' in packages
+
+
+def test_data_source_monthly(pandas_data_source_monthly):
+    """Test data source breakdown with monthly aggregation."""
+    assert pandas_data_source_monthly.index.nlevels == 3
+
+
+def test_pkg_version_single_package(pandas_pkg_version):
+    """Test version breakdown for a single package."""
+    assert len(pandas_pkg_version) > 1
+    versions = pandas_pkg_version.index.get_level_values('pkg_version').unique()
+    assert len(versions) > 1
+
+
+def test_pkg_version_multiple_packages(multi_package_pkg_version):
+    """Test version breakdown for multiple packages."""
+    packages = multi_package_pkg_version.index.get_level_values('pkg_name').unique()
+    assert 'pandas' in packages
+    assert 'dask' in packages
+
+
+def test_pkg_python_single_package(pandas_pkg_python):
+    """Test Python version breakdown for a single package."""
+    assert len(pandas_pkg_python) > 1
+    python_versions = pandas_pkg_python.index.get_level_values('pkg_python').unique()
+    assert len(python_versions) > 1
+
+
+def test_pkg_python_multiple_packages(multi_package_pkg_python):
+    """Test Python version breakdown for multiple packages."""
+    packages = multi_package_pkg_python.index.get_level_values('pkg_name').unique()
+    assert 'pandas' in packages
+    assert 'dask' in packages

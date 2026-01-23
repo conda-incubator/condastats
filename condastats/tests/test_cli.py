@@ -8,6 +8,7 @@ from condastats.cli import main
 
 
 # Subprocess tests (integration tests)
+# These can't easily use fixtures since they run in separate processes
 
 @pytest.mark.parametrize("subcommand,expected", [
     (["overall", "pandas", "--month", "2019-01"], "932443"),
@@ -56,17 +57,30 @@ def test_cli_overall_monthly():
 
 
 # Direct main() tests using monkeypatch (for coverage)
+# These reuse fixture data where the assertions allow
 
-@pytest.mark.parametrize("argv,expected", [
-    (['condastats', 'overall', 'pandas', '--month', '2019-01'], '932443'),
-    (['condastats', 'pkg_platform', 'pandas', '--month', '2019-01'], 'linux-64'),
-    (['condastats', 'data_source', 'pandas', '--month', '2019-01'], 'anaconda'),
-    (['condastats', 'pkg_version', 'pandas', '--month', '2019-01'], 'pandas'),
-    (['condastats', 'pkg_python', 'pandas', '--month', '2019-01'], 'pandas'),
+def test_main_overall(monkeypatch, capsys, pandas_overall):
+    """Test main() with overall subcommand."""
+    monkeypatch.setattr(sys, 'argv', [
+        'condastats', 'overall', 'pandas', '--month', '2019-01'
+    ])
+    main()
+    captured = capsys.readouterr()
+    assert 'pandas' in captured.out
+    assert '932443' in captured.out
+
+
+@pytest.mark.parametrize("subcommand,expected", [
+    ('pkg_platform', 'linux-64'),
+    ('data_source', 'anaconda'),
+    ('pkg_version', 'pandas'),
+    ('pkg_python', 'pandas'),
 ])
-def test_main_subcommands(monkeypatch, capsys, argv, expected):
-    """Test main() with different subcommands."""
-    monkeypatch.setattr(sys, 'argv', argv)
+def test_main_groupby_subcommands(monkeypatch, capsys, subcommand, expected):
+    """Test main() with groupby subcommands."""
+    monkeypatch.setattr(sys, 'argv', [
+        'condastats', subcommand, 'pandas', '--month', '2019-01'
+    ])
     main()
     captured = capsys.readouterr()
     assert expected in captured.out
