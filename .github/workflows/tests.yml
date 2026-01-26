@@ -29,7 +29,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Cache conda pkgs
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/conda_pkgs_dir
           key: pkgs-${{ runner.os }}-${{ runner.arch }}-${{ env.CACHE_NUMBER }}
