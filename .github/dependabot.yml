@@ -1,13 +1,5 @@
 version: 2
 updates:
-  # Python dependencies
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    commit-message:
-      prefix: "deps"
-
   # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
