@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-02-06
+
+### Added
+
+- New pure-pandas query API: `query_overall()`, `query_grouped()`, and `top_packages()` that
+  operate on any pandas DataFrame without requiring dask or s3fs
+- Browser demo now uses the real `condastats` package installed via micropip from PyPI
+
+### Changed
+
+- Refactor `_core.py` to lazily import dask (only when S3 functions are called), so
+  `import condastats` works without dask installed (e.g. in Pyodide)
+- S3-backed functions now delegate aggregation to the new `_query.py` module internally
+
 ## [0.3.0] - 2026-02-06
 
 ### Breaking Changes
