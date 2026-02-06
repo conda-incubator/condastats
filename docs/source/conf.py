@@ -19,7 +19,12 @@ version: str = ".".join(release.split(".")[:2])
 
 # -- General configuration ---------------------------------------------------
 
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode"]
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.viewcode",
+    "sphinx_copybutton",
+]
 
 source_suffix = ".rst"
 master_doc = "index"
@@ -30,10 +35,35 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "conda_sphinx_theme"
 
-html_static_path = ["_static"]
+html_static_path = []
 htmlhelp_basename = "condastatsdoc"
 
-# -- Options for LaTeX output ------------------------------------------------
+# -- Intersphinx -------------------------------------------------------------
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
+    "dask": ("https://docs.dask.org/en/stable", None),
+}
+
+# -- Autodoc -----------------------------------------------------------------
+
+autodoc_default_options = {
+    "members": True,
+    "undoc-members": True,
+    "show-inheritance": True,
+}
+
+autodoc_member_order = "groupwise"
+autodoc_mock_imports = ["snappy"]
+autodoc_typehints = "description"
+
+# -- Copy button -------------------------------------------------------------
+
+copybutton_prompt_text = r">>> |\.\.\. |\$ "
+copybutton_prompt_is_regexp = True
+
+# -- LaTeX output ------------------------------------------------------------
 
 latex_documents = [
     (
@@ -45,11 +75,11 @@ latex_documents = [
     ),
 ]
 
-# -- Options for manual page output ------------------------------------------
+# -- Manual page output ------------------------------------------------------
 
 man_pages = [(master_doc, "condastats", "condastats Documentation", [author], 1)]
 
-# -- Options for Texinfo output ----------------------------------------------
+# -- Texinfo output ----------------------------------------------------------
 
 texinfo_documents = [
     (
@@ -62,12 +92,3 @@ texinfo_documents = [
         "Miscellaneous",
     ),
 ]
-
-# -- Autodoc -----------------------------------------------------------------
-
-autodoc_default_options = {
-    "undoc-members": None,
-}
-
-autodoc_member_order = "groupwise"
-autodoc_mock_imports = ["snappy"]
