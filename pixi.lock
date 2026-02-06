@@ -7839,12 +7839,12 @@ packages:
   timestamp: 1749630737894
 - pypi: ./
   name: condastats
-  version: 0.2.2.dev58+g4df604651.d20260206
-  sha256: 4d2cba0739fdbca7eee7bc1139e093c244a70f0e27c7cb3203ffc47f9f5a2024
+  version: 0.2.2.dev59+ga26dc287f.d20260206
+  sha256: ccf44d44cb6a8fba4df9233d4937316063281b4c59e55072275f96330dfa75d6
   requires_dist:
   - numpy>=1.20.0
   - pandas>=2.0.0
-  - dask[dataframe]>=2024.5.2
+  - dask>=2024.5.2
   - pyarrow>=10.0.0
   - s3fs>=2023.1.0
   - python-snappy>=0.6.1
