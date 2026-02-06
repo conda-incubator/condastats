@@ -27,7 +27,7 @@ requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.20.0",
     "pandas>=2.0.0",
-    "dask[dataframe]>=2024.5.2",
+    "dask>=2024.5.2",
     "pyarrow>=10.0.0",
     "s3fs>=2023.1.0",
     "python-snappy>=0.6.1",
@@ -35,7 +35,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov"]
-doc = ["sphinx", "conda-sphinx-theme"]
+doc = ["sphinx", "conda-sphinx-theme", "sphinx-copybutton", "sphinx-design"]
 
 [project.scripts]
 condastats = "condastats.cli:main"
@@ -92,6 +92,8 @@ ruff = "*"
 [tool.pixi.feature.docs.dependencies]
 sphinx = "*"
 conda-sphinx-theme = "*"
+sphinx-copybutton = "*"
+sphinx-design = "*"
 
 [tool.pixi.feature.py310.dependencies]
 python = "3.10.*"

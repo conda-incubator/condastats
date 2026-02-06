@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Try condastats in your browser</title>
+<!-- Theme CSS from conda-sphinx-theme / pydata-sphinx-theme -->
+<link rel="stylesheet" href="../_static/styles/pydata-sphinx-theme.css">
+<link rel="stylesheet" href="../_static/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+
+  /* ------------------------------------------------------------------ */
+  /* Reset / base                                                       */
+  /* ------------------------------------------------------------------ */
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    font-family: var(--pst-font-family-base);
+    background: var(--pst-color-background);
+    color: var(--pst-color-text-base);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 1.25rem 1.5rem; }
+
+  /* ------------------------------------------------------------------ */
+  /* Header                                                             */
+  /* ------------------------------------------------------------------ */
+  header {
+    text-align: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--pst-color-border);
+  }
+  header h1 {
+    margin: 0 0 0.2rem 0;
+    font-family: var(--pst-font-family-heading);
+    font-size: 1.45rem;
+    font-weight: 700;
+  }
+  header h1 span { color: var(--pst-color-primary); }
+  header p { margin: 0; color: var(--pst-color-text-muted); font-size: 0.88rem; }
+
+  /* ------------------------------------------------------------------ */
+  /* Status bar                                                         */
+  /* ------------------------------------------------------------------ */
+  #status-bar {
+    margin-bottom: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--pst-color-text-muted);
+    display: flex; align-items: center; gap: 0.4rem;
+    transition: opacity 0.4s ease;
+  }
+  #status-bar.ready { opacity: 0; height: 0; margin: 0; overflow: hidden; }
+  #status-bar.error { color: var(--pst-color-danger); }
+  .spinner {
+    display: inline-block; width: 13px; height: 13px;
+    border: 2px solid var(--pst-color-border);
+    border-top-color: var(--pst-color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ------------------------------------------------------------------ */
+  /* Quick-start examples                                               */
+  /* ------------------------------------------------------------------ */
+  .examples {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .example-card {
+    background: var(--pst-color-surface);
+    border: 1px solid var(--pst-color-border);
+    border-radius: .25rem;
+    padding: 0.6rem 0.75rem;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    font-size: 0.82rem;
+  }
+  .example-card:hover {
+    border-color: var(--pst-color-primary);
+    background: var(--pst-color-on-background);
+  }
+  .example-card strong {
+    display: block;
+    font-size: 0.85rem;
+    margin-bottom: 0.15rem;
+  }
+  .example-card span { color: var(--pst-color-text-muted); }
+
+  /* ------------------------------------------------------------------ */
+  /* Form                                                               */
+  /* ------------------------------------------------------------------ */
+  .form-section {
+    background: var(--pst-color-surface);
+    border: 1px solid var(--pst-color-border);
+    border-radius: .25rem;
+    padding: 1rem 1.15rem;
+    margin-bottom: 1rem;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+    margin-bottom: 0.65rem;
+    align-items: end;
+  }
+  .form-row.single { grid-template-columns: 1fr; }
+  .form-row.three  { grid-template-columns: 2fr 1fr 1fr; }
+  .form-group label {
+    display: block; font-size: 0.72rem; font-weight: 600;
+    margin-bottom: 0.2rem; color: var(--pst-color-text-muted);
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .form-group input, .form-group select {
+    width: 100%; padding: 0.45rem 0.65rem;
+    font-size: 0.92rem; font-family: var(--pst-font-family-base);
+    border: 1px solid var(--pst-color-border); border-radius: .25rem;
+    background: var(--pst-color-background); color: var(--pst-color-text-base);
+    transition: border-color 0.15s;
+  }
+  .form-group input:focus, .form-group select:focus {
+    outline: none; border-color: var(--pst-color-primary);
+    box-shadow: 0 0 0 .1875rem color-mix(in srgb, var(--pst-color-primary) 25%, transparent);
+  }
+  .btn-row { display: flex; gap: 0.5rem; }
+  button {
+    padding: 0.55rem 1rem; font-size: 0.92rem; font-weight: 600;
+    font-family: var(--pst-font-family-base); border: none; border-radius: .25rem;
+    cursor: pointer; transition: background 0.15s;
+  }
+  #run-btn {
+    flex: 1; color: #fff; background: var(--pst-color-primary);
+  }
+  #run-btn:hover:not(:disabled) { background: var(--pst-color-primary-highlight); }
+  #run-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .note { font-size: 0.76rem; color: var(--pst-color-text-muted); margin: 0.4rem 0 0; }
+  .range-presets { flex: 1; }
+  .preset-btns { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+  .preset-btn {
+    padding: 0.45rem 0.65rem; font-size: 0.82rem; font-weight: 600;
+    font-family: var(--pst-font-family-base); border: 1px solid var(--pst-color-border);
+    border-radius: .25rem; background: var(--pst-color-background); color: var(--pst-color-text-muted);
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .preset-btn:hover { border-color: var(--pst-color-primary); color: var(--pst-color-text-base); }
+  .preset-btn.active {
+    background: var(--pst-color-primary); color: #fff; border-color: var(--pst-color-primary);
+  }
+  #download-progress { font-size: 0.78rem; color: var(--pst-color-text-muted); margin-top: 0.25rem; }
+
+  /* ------------------------------------------------------------------ */
+  /* Results                                                            */
+  /* ------------------------------------------------------------------ */
+  #results { margin-top: 1rem; display: none; }
+  #results h2 {
+    font-family: var(--pst-font-family-heading);
+    font-size: 1.05rem; margin: 0 0 0.75rem 0;
+  }
+
+  /* Hero number */
+  .hero-stat {
+    text-align: center; padding: 1rem 0 0.5rem;
+  }
+  .hero-stat .number {
+    font-family: var(--pst-font-family-heading);
+    font-size: 2.4rem; font-weight: 700; color: var(--pst-color-primary);
+  }
+  .hero-stat .label {
+    font-size: 0.88rem; color: var(--pst-color-text-muted);
+  }
+
+  /* Summary cards */
+  .summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.5rem; margin-bottom: 1rem;
+  }
+  .summary-card {
+    background: var(--pst-color-surface); border: 1px solid var(--pst-color-border);
+    border-radius: .25rem; padding: 0.6rem 0.75rem; text-align: center;
+  }
+  .summary-card .value {
+    font-family: var(--pst-font-family-heading);
+    font-size: 1.15rem; font-weight: 700; color: var(--pst-color-primary);
+  }
+  .summary-card .label {
+    font-size: 0.72rem; color: var(--pst-color-text-muted);
+    text-transform: uppercase; letter-spacing: 0.03em;
+  }
+
+  /* Chart */
+  .chart-wrap {
+    position: relative; margin-bottom: 1rem;
+    background: var(--pst-color-surface); border: 1px solid var(--pst-color-border);
+    border-radius: .25rem; padding: 0.75rem;
+  }
+  .chart-wrap canvas { max-height: 350px; }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; }
+  .table-wrap table {
+    width: 100%; border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  .table-wrap table th, .table-wrap table td {
+    padding: 0.35rem 0.65rem; text-align: left;
+    border-bottom: 1px solid var(--pst-color-border);
+  }
+  .table-wrap table th {
+    background: var(--pst-color-surface); font-weight: 600;
+    font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.03em; color: var(--pst-color-text-muted);
+  }
+  .table-wrap table tr:hover td { background: var(--pst-color-surface); }
+  .error-msg {
+    padding: 0.65rem 0.85rem; background: rgba(220,53,69,0.08);
+    border: 1px solid var(--pst-color-danger); border-radius: .25rem;
+    color: var(--pst-color-danger); font-size: 0.88rem;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Footer                                                             */
+  /* ------------------------------------------------------------------ */
+  footer {
+    margin-top: 1.5rem; padding-top: 0.75rem;
+    border-top: 1px solid var(--pst-color-border);
+    text-align: center; font-size: 0.76rem; color: var(--pst-color-text-muted);
+  }
+  footer a { color: var(--pst-color-primary); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ------------------------------------------------------------------ */
+  /* Consent overlay                                                    */
+  /* ------------------------------------------------------------------ */
+  #consent-overlay {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    margin: 1rem 0;
+    border: 1px dashed var(--pst-color-border);
+    border-radius: .25rem;
+    background: var(--pst-color-surface);
+  }
+  #consent-overlay p {
+    margin: 0 0 1rem; font-size: 0.9rem; color: var(--pst-color-text-muted);
+    max-width: 480px; margin-left: auto; margin-right: auto;
+  }
+  #consent-btn {
+    padding: 0.6rem 1.4rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--pst-color-primary);
+    border: none;
+    border-radius: .25rem;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #consent-btn:hover { background: var(--pst-color-primary-highlight); }
+
+  /* ------------------------------------------------------------------ */
+  /* Embed mode (?embed=1): compact widget, no chrome                   */
+  /* ------------------------------------------------------------------ */
+  body.embed-mode .container { max-width: 100%; padding: 0.75rem 1rem; }
+  body.embed-mode header,
+  body.embed-mode .examples,
+  body.embed-mode footer { display: none !important; }
+  body.embed-mode .form-section { margin-bottom: 0.5rem; }
+  body.embed-mode .note { display: none; }
+  body.embed-mode #results { margin-top: 0.5rem; }
+  body.embed-mode .hero-stat .number { font-size: 2rem; }
+  body.embed-mode .summary-cards { gap: 0.5rem; }
+  body.embed-mode #consent-overlay { padding: 1.2rem 1rem; margin: 0; border: none; background: transparent; }
+  body.embed-mode #consent-overlay p { font-size: 0.82rem; margin-bottom: 0.7rem; }
+</style>
+</head>
+<body>
+<script>if(new URLSearchParams(location.search).has('embed'))document.body.classList.add('embed-mode');</script>
+<div class="container">
+
+<header>
+  <h1><span>condastats</span> &mdash; Try in your browser</h1>
+  <p>Query conda package download statistics with Python running entirely in your browser via Pyodide.</p>
+</header>
+
+<!-- Consent overlay – shown until user opts in -->
+<div id="consent-overlay">
+  <p>This demo downloads <strong>Pyodide</strong> (~20 MB) to run Python in
+  your browser, then fetches package data (1&ndash;15 MB per month) from
+  GitHub Pages.</p>
+  <button id="consent-btn">Start interactive demo</button>
+</div>
+
+<div id="app-content" style="display:none">
+
+<div id="status-bar" class="loading">
+  <span class="spinner"></span>
+  <span id="status-text">Loading Pyodide runtime&hellip;</span>
+</div>
+
+<!-- Quick-start examples -->
+<div class="examples" id="examples">
+  <div class="example-card" data-action="top20">
+    <strong>Top 20 packages</strong>
+    <span>Most downloaded this period</span>
+  </div>
+  <div class="example-card" data-pkg="numpy, scipy, pandas" data-type="overall">
+    <strong>Scientific Python</strong>
+    <span>numpy vs scipy vs pandas</span>
+  </div>
+  <div class="example-card" data-pkg="pytorch, tensorflow, transformers" data-type="overall">
+    <strong>AI / ML frameworks</strong>
+    <span>PyTorch vs TensorFlow vs Transformers</span>
+  </div>
+  <div class="example-card" data-pkg="python" data-type="pkg_version">
+    <strong>Python versions</strong>
+    <span>Which CPython versions are popular?</span>
+  </div>
+  <div class="example-card" data-pkg="flask, django, fastapi" data-type="overall">
+    <strong>Web frameworks</strong>
+    <span>Flask vs Django vs FastAPI</span>
+  </div>
+  <div class="example-card" data-pkg="matplotlib, plotly, seaborn" data-type="overall">
+    <strong>Visualization</strong>
+    <span>matplotlib vs plotly vs seaborn</span>
+  </div>
+  <div class="example-card" data-pkg="numpy" data-type="pkg_platform">
+    <strong>Platform breakdown</strong>
+    <span>numpy across linux / osx / win</span>
+  </div>
+  <div class="example-card" data-pkg="pytorch" data-type="data_source">
+    <strong>PyTorch by channel</strong>
+    <span>anaconda vs conda-forge</span>
+  </div>
+  <div class="example-card" data-pkg="polars, dask, vaex" data-type="overall">
+    <strong>Dataframe challengers</strong>
+    <span>polars vs dask vs vaex</span>
+  </div>
+  <div class="example-card" data-pkg="jupyterlab, notebook" data-type="overall">
+    <strong>Jupyter showdown</strong>
+    <span>JupyterLab vs classic Notebook</span>
+  </div>
+  <div class="example-card" data-pkg="scikit-learn" data-type="pkg_python">
+    <strong>scikit-learn by Python</strong>
+    <span>Which Python versions use sklearn?</span>
+  </div>
+  <div class="example-card" data-pkg="conda, mamba, pixi" data-type="overall">
+    <strong>Package managers</strong>
+    <span>conda vs mamba vs pixi</span>
+  </div>
+</div>
+
+<!-- Form -->
+<div class="form-section">
+  <div class="form-row three">
+    <div class="form-group">
+      <label for="package">Package(s) <small style="text-transform:none;font-weight:400">&mdash; comma-separated</small></label>
+      <input type="text" id="package" list="pkg-suggestions" value="pandas" placeholder="e.g. pandas, numpy" autocomplete="off">
+      <datalist id="pkg-suggestions"></datalist>
+    </div>
+    <div class="form-group">
+      <label for="month-start">From</label>
+      <input type="month" id="month-start">
+    </div>
+    <div class="form-group">
+      <label for="month-end">To</label>
+      <input type="month" id="month-end">
+    </div>
+  </div>
+  <div class="form-row" style="grid-template-columns: 1fr auto;">
+    <div class="form-group">
+      <label for="query-type">Group by</label>
+      <select id="query-type">
+        <option value="overall">Overall</option>
+        <option value="pkg_platform">Platform</option>
+        <option value="data_source">Data source</option>
+        <option value="pkg_version">Pkg version</option>
+        <option value="pkg_python">Python version</option>
+      </select>
+    </div>
+    <div class="form-group range-presets">
+      <label>Quick range</label>
+      <div class="preset-btns">
+        <button class="preset-btn" data-range="1" title="Single month">1 month</button>
+        <button class="preset-btn" data-range="3" title="Last 3 months">3 months</button>
+        <button class="preset-btn" data-range="6" title="Last 6 months">6 months</button>
+        <button class="preset-btn active" data-range="12" title="Last 12 months">1 year</button>
+        <button class="preset-btn" data-range="24" title="Last 2 years">2 years</button>
+      </div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button id="run-btn" disabled>Loading&hellip;</button>
+  </div>
+  <p class="note">
+    Each month downloads 1&ndash;15&nbsp;MB. Already-fetched months are cached
+    and reused instantly.
+  </p>
+</div>
+
+<!-- Results -->
+<div id="results">
+  <h2 id="results-title"></h2>
+  <div id="hero-stat" class="hero-stat" style="display:none">
+    <div class="number" id="hero-number"></div>
+    <div class="label" id="hero-label"></div>
+  </div>
+  <div id="summary-cards" class="summary-cards" style="display:none"></div>
+  <div id="chart-container" class="chart-wrap" style="display:none">
+    <canvas id="result-chart"></canvas>
+  </div>
+  <div id="results-content" class="table-wrap"></div>
+</div>
+
+</div><!-- /app-content -->
+
+<footer>
+  Powered by
+  <a href="https://pyodide.org/" target="_blank" rel="noopener">Pyodide</a>,
+  <a href="https://pandas.pydata.org/" target="_blank" rel="noopener">pandas</a>,
+  <a href="https://github.com/dask/fastparquet" target="_blank" rel="noopener">fastparquet</a> &amp;
+  <a href="https://www.chartjs.org/" target="_blank" rel="noopener">Chart.js</a>.
+  Data from the
+  <a href="https://github.com/anaconda/anaconda-package-data" target="_blank" rel="noopener">Anaconda public dataset</a>.
+  <br>
+  <a href="../">&larr; Back to condastats documentation</a>
+  &middot;
+  <a href="https://github.com/conda-incubator/condastats" target="_blank" rel="noopener">GitHub</a>
+</footer>
+
+</div>
+
+<script>
+/* ====================================================================
+   Data URL
+   ==================================================================== */
+const DATA_BASE = "https://conda-incubator.github.io/condastats-data";
+function dataUrl(year, month) {
+  return DATA_BASE + "/" + year + "/" + year + "-" + String(month).padStart(2, "0") + ".parquet";
+}
+
+/* ====================================================================
+   State
+   ==================================================================== */
+let pyodide = null;
+let cachedMonthKeys = new Set();   // months already downloaded
+let activeMonthSig = null;         // signature of currently-active range
+let resultChart = null;
+const CHART_COLORS = [
+  "#348721","#2563eb","#d97706","#7c3aed",
+  "#dc2626","#0891b2","#be185d","#4d7c0f",
+  "#6366f1","#ea580c","#0d9488","#a21caf",
+];
+
+/* ====================================================================
+   UI helpers
+   ==================================================================== */
+const $ = (s) => document.querySelector(s);
+
+function setStatus(text, cls) {
+  const bar = $("#status-bar");
+  bar.className = cls;
+  let sp = bar.querySelector(".spinner");
+  if (cls === "loading") {
+    if (!sp) { sp = document.createElement("span"); sp.className = "spinner"; bar.prepend(sp); }
+  } else if (sp) { sp.remove(); }
+  $("#status-text").textContent = text;
+}
+
+function monthStr(date) {
+  return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0");
+}
+
+function setDefaultRange() {
+  const end = new Date(); end.setMonth(end.getMonth() - 2);
+  const start = new Date(end); start.setMonth(start.getMonth() - 11);
+  $("#month-start").value = monthStr(start);
+  $("#month-end").value = monthStr(end);
+}
+
+function getMonthList(startVal, endVal) {
+  /* Return array of "YYYY-MM" strings from startVal to endVal inclusive. */
+  const months = [];
+  const [sy, sm] = startVal.split("-").map(Number);
+  const [ey, em] = endVal.split("-").map(Number);
+  let y = sy, m = sm;
+  while (y < ey || (y === ey && m <= em)) {
+    months.push(y + "-" + String(m).padStart(2, "0"));
+    m++;
+    if (m > 12) { m = 1; y++; }
+  }
+  return months;
+}
+
+function applyPreset(nMonths) {
+  const end = new Date(); end.setMonth(end.getMonth() - 2);
+  const start = new Date(end); start.setMonth(start.getMonth() - (nMonths - 1));
+  $("#month-start").value = monthStr(start);
+  $("#month-end").value = monthStr(end);
+}
+
+function hideResults() {
+  $("#hero-stat").style.display = "none";
+  $("#summary-cards").style.display = "none";
+  $("#chart-container").style.display = "none";
+  $("#results-content").innerHTML = "";
+  if (resultChart) { resultChart.destroy(); resultChart = null; }
+}
+
+/* ====================================================================
+   Chart rendering
+   ==================================================================== */
+function renderChart(jsonData) {
+  if (resultChart) { resultChart.destroy(); resultChart = null; }
+  if (!jsonData || !jsonData.labels || jsonData.labels.length === 0) {
+    $("#chart-container").style.display = "none";
+    return;
+  }
+
+  $("#chart-container").style.display = "block";
+  const ctx = $("#result-chart").getContext("2d");
+
+  const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const gridColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
+  const textColor = isDark ? "#94a3b8" : "#6b7280";
+
+  // Multiple datasets (comparison) or single
+  const datasets = jsonData.datasets.map((ds, i) => ({
+    label: ds.label,
+    data: ds.data,
+    backgroundColor: CHART_COLORS[i % CHART_COLORS.length] + "cc",
+    borderColor: CHART_COLORS[i % CHART_COLORS.length],
+    borderWidth: 1,
+    borderRadius: 3,
+  }));
+
+  resultChart = new Chart(ctx, {
+    type: "bar",
+    data: { labels: jsonData.labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: jsonData.labels.length > 12 ? "y" : "x",
+      plugins: {
+        legend: {
+          display: datasets.length > 1,
+          labels: { color: textColor, font: { family: "Open Sans" } },
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => ctx.dataset.label + ": " + ctx.parsed[jsonData.labels.length > 12 ? "x" : "y"].toLocaleString(),
+          },
+        },
+      },
+      scales: {
+        x: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 11 } } },
+        y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 11 } } },
+      },
+    },
+  });
+}
+
+/* ====================================================================
+   Pyodide bootstrap
+   ==================================================================== */
+const PYTHON_HELPERS = `
+import pandas as pd
+from io import BytesIO
+import json
+
+_df = None
+_pkg_names = []
+_month_frames = {}
+
+def load_parquet(raw, month_key):
+    """Load a single month's parquet into the cache."""
+    df = pd.read_parquet(BytesIO(bytes(raw)), engine="fastparquet")
+    _month_frames[month_key] = df
+    return json.dumps({"rows": len(df), "month": month_key})
+
+def activate_months(month_keys_json):
+    """Concatenate cached months into the active DataFrame."""
+    global _df, _pkg_names
+    keys = json.loads(month_keys_json)
+    frames = [_month_frames[k] for k in keys if k in _month_frames]
+    if not frames:
+        return json.dumps({"error": "No data loaded."})
+    _df = pd.concat(frames, ignore_index=True)
+    _pkg_names = sorted(_df["pkg_name"].unique().tolist())
+    return json.dumps({"rows": len(_df), "packages": len(_pkg_names), "months": len(frames)})
+
+def get_package_names():
+    return json.dumps(_pkg_names)
+
+def query(packages_str, query_type="overall"):
+    """Return JSON with table HTML, chart data, and summary stats."""
+    if _df is None:
+        return json.dumps({"error": "No data loaded."})
+
+    pkgs = [p.strip().lower() for p in packages_str.split(",") if p.strip()]
+    if not pkgs:
+        return json.dumps({"error": "Please enter at least one package name."})
+
+    filtered = _df[_df["pkg_name"].isin(pkgs)]
+    if len(filtered) == 0:
+        matches = sorted([n for n in _pkg_names if any(p in n for p in pkgs)])[:15]
+        suggestions = ", ".join(matches) if matches else "none"
+        return json.dumps({"error": f"No data found. Similar: {suggestions}"})
+
+    result = {}
+
+    # Summary stats
+    total = int(filtered["counts"].sum())
+    n_platforms = int(filtered["pkg_platform"].nunique()) if "pkg_platform" in filtered.columns else 0
+    n_versions = int(filtered["pkg_version"].nunique()) if "pkg_version" in filtered.columns else 0
+    top_platform = filtered.groupby("pkg_platform")["counts"].sum().idxmax() if n_platforms > 0 else ""
+    top_source = filtered.groupby("data_source")["counts"].sum().idxmax() if "data_source" in filtered.columns else ""
+    result["summary"] = {
+        "total": total,
+        "platforms": n_platforms,
+        "versions": n_versions,
+        "top_platform": str(top_platform),
+        "top_source": str(top_source),
+    }
+
+    # Build grouped data
+    if query_type == "overall" and len(pkgs) == 1:
+        # Single package overall -> hero number
+        result["hero"] = {"value": total, "label": f"total downloads for {pkgs[0]}"}
+        result["table"] = ""
+        result["chart"] = None
+    elif query_type == "overall":
+        # Multi-package comparison
+        grp = filtered.groupby("pkg_name", observed=True)["counts"].sum().sort_values(ascending=False)
+        result["chart"] = {
+            "labels": grp.index.tolist(),
+            "datasets": [{"label": "Downloads", "data": grp.values.tolist()}],
+        }
+        out = grp.reset_index()
+        out.columns = ["Package", "Downloads"]
+        out["Downloads"] = out["Downloads"].apply(lambda x: f"{x:,}")
+        result["table"] = out.to_html(index=False, border=0)
+    else:
+        # Grouped by dimension
+        if len(pkgs) == 1:
+            grp = filtered.groupby(query_type, observed=True)["counts"].sum().sort_values(ascending=False)
+            result["chart"] = {
+                "labels": [str(x) for x in grp.index.tolist()],
+                "datasets": [{"label": pkgs[0], "data": grp.values.tolist()}],
+            }
+            out = grp.reset_index()
+            out.columns = [query_type.replace("_", " ").title(), "Downloads"]
+            out["Downloads"] = out["Downloads"].apply(lambda x: f"{x:,}")
+            result["table"] = out.to_html(index=False, border=0)
+        else:
+            # Multi-package grouped comparison
+            pivot = filtered.groupby(["pkg_name", query_type], observed=True)["counts"].sum().unstack(fill_value=0)
+            all_dims = pivot.columns.tolist()
+            datasets = []
+            for pkg in pkgs:
+                if pkg in pivot.index:
+                    datasets.append({"label": pkg, "data": [int(pivot.loc[pkg, d]) for d in all_dims]})
+            result["chart"] = {
+                "labels": [str(d) for d in all_dims],
+                "datasets": datasets,
+            }
+            # Flat table
+            flat = filtered.groupby(["pkg_name", query_type], observed=True)["counts"].sum().reset_index()
+            flat.columns = ["Package", query_type.replace("_", " ").title(), "Downloads"]
+            flat = flat.sort_values("Downloads", ascending=False)
+            flat["Downloads"] = flat["Downloads"].apply(lambda x: f"{x:,}")
+            result["table"] = flat.to_html(index=False, border=0)
+
+    return json.dumps(result)
+
+def top_packages(n=20):
+    if _df is None:
+        return json.dumps({"error": "No data loaded."})
+    grp = _df.groupby("pkg_name", observed=True)["counts"].sum().sort_values(ascending=False).head(n)
+    chart = {
+        "labels": grp.index.tolist(),
+        "datasets": [{"label": "Downloads", "data": grp.values.tolist()}],
+    }
+    out = grp.reset_index()
+    out.columns = ["Package", "Downloads"]
+    out["Downloads"] = out["Downloads"].apply(lambda x: f"{x:,}")
+    summary = {"total": int(grp.sum()), "packages": len(grp)}
+    return json.dumps({"chart": chart, "table": out.to_html(index=False, border=0), "summary": summary})
+`;
+
+async function initPyodide() {
+  setStatus("Downloading Pyodide runtime\u2026", "loading");
+  const script = document.createElement("script");
+  script.src = "https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js";
+  document.head.appendChild(script);
+  await new Promise((res, rej) => { script.onload = res; script.onerror = () => rej(new Error("Failed to load Pyodide")); });
+
+  setStatus("Initializing Python\u2026", "loading");
+  pyodide = await loadPyodide();
+
+  setStatus("Installing pandas + fastparquet\u2026", "loading");
+  await pyodide.loadPackage(["pandas", "fastparquet"]);
+  await pyodide.runPythonAsync(PYTHON_HELPERS);
+
+  setStatus("Ready \u2014 pick an example or enter a package name.", "ready");
+  $("#run-btn").disabled = false;
+  $("#run-btn").textContent = "Query";
+}
+
+/* ====================================================================
+   Data loading
+   ==================================================================== */
+async function ensureData(startVal, endVal) {
+  const months = getMonthList(startVal, endVal);
+  const sig = months.join(",");
+  if (sig === activeMonthSig) return;
+
+  // Download months we don't have yet
+  const needed = months.filter(m => !cachedMonthKeys.has(m));
+  if (needed.length > 0) {
+    let done = 0;
+    setStatus("Downloading " + needed.length + " month(s)\u2026", "loading");
+    // Download in parallel, batches of 4 to be polite
+    for (let i = 0; i < needed.length; i += 4) {
+      const batch = needed.slice(i, i + 4);
+      await Promise.all(batch.map(async (mKey) => {
+        const [y, m] = mKey.split("-").map(Number);
+        const resp = await fetch(dataUrl(y, m));
+        if (!resp.ok) throw new Error("Data not available for " + mKey + " (HTTP " + resp.status + ")");
+        const buf = await resp.arrayBuffer();
+        pyodide.globals.set("_parquet_bytes", pyodide.toPy(new Uint8Array(buf)));
+        await pyodide.runPythonAsync("load_parquet(_parquet_bytes, " + JSON.stringify(mKey) + ")");
+        cachedMonthKeys.add(mKey);
+        done++;
+        setStatus("Downloaded " + done + " / " + needed.length + " months\u2026", "loading");
+      }));
+    }
+  }
+
+  // Activate (concatenate) the requested months
+  setStatus("Preparing " + months.length + " month(s)\u2026", "loading");
+  const info = JSON.parse(await pyodide.runPythonAsync(
+    "activate_months(" + JSON.stringify(JSON.stringify(months)) + ")"
+  ));
+  activeMonthSig = sig;
+
+  // Populate autocomplete
+  const names = JSON.parse(await pyodide.runPythonAsync("get_package_names()"));
+  const dl = $("#pkg-suggestions");
+  dl.innerHTML = "";
+  names.slice(0, 500).forEach(n => {
+    const opt = document.createElement("option");
+    opt.value = n;
+    dl.appendChild(opt);
+  });
+
+  const label = months.length === 1
+    ? "Loaded " + months[0]
+    : "Loaded " + months.length + " months (" + months[0] + " to " + months[months.length - 1] + ")";
+  setStatus(label + " \u2014 " + info.rows.toLocaleString() + " rows, " + info.packages.toLocaleString() + " packages.", "ready");
+}
+
+/* ====================================================================
+   Render results
+   ==================================================================== */
+function showResults(data, title) {
+  hideResults();
+  $("#results").style.display = "block";
+  $("#results-title").textContent = title;
+
+  if (data.error) {
+    $("#results-content").innerHTML = '<p class="error-msg">' + data.error + '</p>';
+    return;
+  }
+
+  // Hero number
+  if (data.hero) {
+    $("#hero-stat").style.display = "block";
+    $("#hero-number").textContent = data.hero.value.toLocaleString();
+    $("#hero-label").textContent = data.hero.label;
+  }
+
+  // Summary cards
+  if (data.summary) {
+    const s = data.summary;
+    let html = "";
+    html += '<div class="summary-card"><div class="value">' + s.total.toLocaleString() + '</div><div class="label">Total downloads</div></div>';
+    if (s.platforms) html += '<div class="summary-card"><div class="value">' + s.platforms + '</div><div class="label">Platforms</div></div>';
+    if (s.top_platform) html += '<div class="summary-card"><div class="value">' + s.top_platform + '</div><div class="label">Top platform</div></div>';
+    if (s.top_source) html += '<div class="summary-card"><div class="value">' + s.top_source + '</div><div class="label">Top source</div></div>';
+    if (s.versions) html += '<div class="summary-card"><div class="value">' + s.versions + '</div><div class="label">Versions</div></div>';
+    $("#summary-cards").innerHTML = html;
+    $("#summary-cards").style.display = "grid";
+  }
+
+  // Chart
+  if (data.chart) renderChart(data.chart);
+
+  // Table
+  if (data.table) $("#results-content").innerHTML = data.table;
+}
+
+/* ====================================================================
+   Query execution
+   ==================================================================== */
+function rangeLabel() {
+  const s = $("#month-start").value, e = $("#month-end").value;
+  return s === e ? s : s + " to " + e;
+}
+
+async function runQuery() {
+  const pkg = $("#package").value.trim();
+  if (!pkg) { alert("Enter a package name."); return; }
+  const startVal = $("#month-start").value;
+  const endVal = $("#month-end").value;
+  if (!startVal || !endVal) { alert("Select a date range."); return; }
+  if (startVal > endVal) { alert("Start month must be before end month."); return; }
+  const qtype = $("#query-type").value;
+
+  const btn = $("#run-btn");
+  btn.disabled = true; btn.textContent = "Working\u2026";
+  try {
+    await ensureData(startVal, endVal);
+    setStatus("Running query\u2026", "loading");
+    const raw = await pyodide.runPythonAsync(
+      "query(" + JSON.stringify(pkg) + ", " + JSON.stringify(qtype) + ")"
+    );
+    const data = JSON.parse(raw);
+
+    const labels = {
+      overall: "Overall downloads",
+      pkg_platform: "Downloads by platform",
+      data_source: "Downloads by data source",
+      pkg_version: "Downloads by version",
+      pkg_python: "Downloads by Python version",
+    };
+    showResults(data, labels[qtype] + " (" + rangeLabel() + ")");
+    setStatus("Query complete.", "ready");
+  } catch (err) {
+    setStatus("Error: " + err.message, "error");
+    showResults({ error: err.message }, "Error");
+  } finally {
+    btn.disabled = false; btn.textContent = "Query";
+  }
+}
+
+async function runTop20() {
+  const startVal = $("#month-start").value;
+  const endVal = $("#month-end").value;
+  if (!startVal || !endVal) { alert("Select a date range."); return; }
+  if (startVal > endVal) { alert("Start month must be before end month."); return; }
+  const btn = $("#run-btn");
+  btn.disabled = true; btn.textContent = "Working\u2026";
+  try {
+    await ensureData(startVal, endVal);
+    setStatus("Finding top packages\u2026", "loading");
+    const raw = await pyodide.runPythonAsync("top_packages(20)");
+    const data = JSON.parse(raw);
+    showResults(data, "Top 20 most downloaded packages (" + rangeLabel() + ")");
+    setStatus("Query complete.", "ready");
+  } catch (err) {
+    setStatus("Error: " + err.message, "error");
+    showResults({ error: err.message }, "Error");
+  } finally {
+    btn.disabled = false; btn.textContent = "Query";
+  }
+}
+
+/* ====================================================================
+   Quick-start cards
+   ==================================================================== */
+document.querySelectorAll(".example-card").forEach(card => {
+  card.addEventListener("click", () => {
+    if ($("#run-btn").disabled) return;
+    if (card.dataset.action === "top20") {
+      $("#package").value = "";
+      runTop20();
+    } else {
+      $("#package").value = card.dataset.pkg;
+      $("#query-type").value = card.dataset.type;
+      runQuery();
+    }
+  });
+});
+
+/* ====================================================================
+   Init
+   ==================================================================== */
+setDefaultRange();
+$("#run-btn").addEventListener("click", runQuery);
+$("#package").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !$("#run-btn").disabled) runQuery();
+});
+
+// Preset range buttons
+document.querySelectorAll(".preset-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    applyPreset(parseInt(btn.dataset.range, 10));
+  });
+});
+
+// Clear preset highlight when user manually edits dates
+["month-start", "month-end"].forEach(id => {
+  document.getElementById(id).addEventListener("input", () => {
+    document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
+  });
+});
+
+function startDemo() {
+  $("#consent-overlay").style.display = "none";
+  $("#app-content").style.display = "block";
+  initPyodide().catch((err) => {
+    setStatus("Failed to initialize: " + err.message, "error");
+    console.error(err);
+  });
+}
+
+$("#consent-btn").addEventListener("click", startDemo);
+
+// In standalone mode (not embedded), skip consent and start immediately
+if (!document.body.classList.contains("embed-mode")) {
+  startDemo();
+}
+</script>
+</body>
+</html>

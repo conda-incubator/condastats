@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath("."))
 
 # -- Project information -----------------------------------------------------
 
-project = "condastats"
+project = html_title = "condastats"
 copyright = "2019-2026, Sophia Man Yang"
 author = "Sophia Man Yang"
 
@@ -19,7 +19,13 @@ version: str = ".".join(release.split(".")[:2])
 
 # -- General configuration ---------------------------------------------------
 
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode"]
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.viewcode",
+    "sphinx_copybutton",
+    "sphinx_design",
+]
 
 source_suffix = ".rst"
 master_doc = "index"
@@ -31,9 +37,67 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_theme = "conda_sphinx_theme"
 
 html_static_path = ["_static"]
+html_extra_path = ["_extra"]
 htmlhelp_basename = "condastatsdoc"
 
-# -- Options for LaTeX output ------------------------------------------------
+html_theme_options = {
+    "navigation_depth": -1,
+    "use_edit_page_button": True,
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/conda-incubator/condastats",
+            "icon": "fa-brands fa-square-github",
+            "type": "fontawesome",
+        },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/condastats/",
+            "icon": "fa-brands fa-python",
+            "type": "fontawesome",
+        },
+        {
+            "name": "conda-forge",
+            "url": "https://anaconda.org/conda-forge/condastats",
+            "icon": "fa-solid fa-cube",
+            "type": "fontawesome",
+        },
+    ],
+}
+
+html_context = {
+    "github_user": "conda-incubator",
+    "github_repo": "condastats",
+    "github_version": "main",
+    "doc_path": "docs/source",
+}
+
+# -- Intersphinx -------------------------------------------------------------
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
+    "dask": ("https://docs.dask.org/en/stable", None),
+}
+
+# -- Autodoc -----------------------------------------------------------------
+
+autodoc_default_options = {
+    "members": True,
+    "undoc-members": True,
+    "show-inheritance": True,
+}
+
+autodoc_member_order = "groupwise"
+autodoc_mock_imports = ["snappy"]
+autodoc_typehints = "description"
+
+# -- Copy button -------------------------------------------------------------
+
+copybutton_prompt_text = r">>> |\.\.\. |\$ "
+copybutton_prompt_is_regexp = True
+
+# -- LaTeX output ------------------------------------------------------------
 
 latex_documents = [
     (
@@ -45,11 +109,11 @@ latex_documents = [
     ),
 ]
 
-# -- Options for manual page output ------------------------------------------
+# -- Manual page output ------------------------------------------------------
 
 man_pages = [(master_doc, "condastats", "condastats Documentation", [author], 1)]
 
-# -- Options for Texinfo output ----------------------------------------------
+# -- Texinfo output ----------------------------------------------------------
 
 texinfo_documents = [
     (
@@ -62,12 +126,3 @@ texinfo_documents = [
         "Miscellaneous",
     ),
 ]
-
-# -- Autodoc -----------------------------------------------------------------
-
-autodoc_default_options = {
-    "undoc-members": None,
-}
-
-autodoc_member_order = "groupwise"
-autodoc_mock_imports = ["snappy"]
