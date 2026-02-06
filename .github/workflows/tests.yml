@@ -12,45 +12,36 @@ concurrency:
 jobs:
   test:
     runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: ${{ matrix.os == 'windows-latest' && 'pwsh' || 'bash -el {0}' }}
     strategy:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest", "macos-latest", "windows-latest"]
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        environment: ["test-py310", "test-py311", "test-py312", "test-py313", "test-py314"]
     timeout-minutes: 30
-    env:
-      CACHE_NUMBER: 0  # Increase to reset cache
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
-      - name: Cache conda pkgs
-        uses: actions/cache@v5
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@28eb668aafebd9dede9d97c4ba1cd9989a4d0004 # v0.9.2
         with:
-          path: ~/conda_pkgs_dir
-          key: pkgs-${{ runner.os }}-${{ runner.arch }}-${{ env.CACHE_NUMBER }}
-      - name: Setup Conda
-        uses: conda-incubator/setup-miniconda@v3
+          environments: ${{ matrix.environment }}
+          cache: true
+      - name: Test
+        run: pixi run -e ${{ matrix.environment }} test
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@28eb668aafebd9dede9d97c4ba1cd9989a4d0004 # v0.9.2
         with:
-          miniforge-variant: Miniforge3
-          miniforge-version: latest
-          python-version: ${{ matrix.python-version }}
-          activate-environment: test-env
-          channels: conda-forge
-          channel-priority: strict
-          conda-remove-defaults: true
-          pkgs-dirs: ~/conda_pkgs_dir
-      - name: Enable sharded repodata
-        run: |
-          conda install -n base -y "conda-libmamba-solver>=25.11.0"
-          conda config --set plugins.use_sharded_repodata true
-      - name: Install dependencies
-        run: |
-          conda install -y "numpy>=1.20.0" "pandas>=2.0.0" "dask>=2024.5.2" "pyarrow>=10.0.0" "s3fs>=2023.1.0" python-snappy pytest pytest-cov
-          pip install -e . --no-deps
-      - name: PyTest
-        run: pytest -v --cov=condastats --cov-report=term-missing
+          environments: lint
+          cache: true
+      - name: Lint
+        run: pixi run -e lint lint
+      - name: Format check
+        run: pixi run -e lint format-check

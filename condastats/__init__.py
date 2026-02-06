@@ -1,12 +1,24 @@
-# -*- coding: utf-8 -*-
+"""condastats - Query download statistics for conda packages."""
 
-"""Top-level package for condastats."""
+from importlib.metadata import PackageNotFoundError, version
 
-from importlib.metadata import version, PackageNotFoundError
-
-__author__ = """Sophia Man Yang"""
+from condastats._core import (
+    data_source,
+    overall,
+    pkg_platform,
+    pkg_python,
+    pkg_version,
+)
 
 try:
     __version__ = version("condastats")
 except PackageNotFoundError:
     __version__ = "0.0.0"
+
+__all__ = [
+    "data_source",
+    "overall",
+    "pkg_platform",
+    "pkg_python",
+    "pkg_version",
+]

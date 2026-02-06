@@ -100,3 +100,9 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# pixi
+.pixi/
+
+# Test S3 cache
+tests/.s3_cache/
