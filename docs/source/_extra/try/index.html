@@ -421,6 +421,7 @@
 
 <footer>
   Powered by
+  <a href="https://github.com/conda-incubator/condastats" target="_blank" rel="noopener">condastats</a>,
   <a href="https://pyodide.org/" target="_blank" rel="noopener">Pyodide</a>,
   <a href="https://pandas.pydata.org/" target="_blank" rel="noopener">pandas</a>,
   <a href="https://github.com/dask/fastparquet" target="_blank" rel="noopener">fastparquet</a> &amp;
@@ -573,6 +574,10 @@ import pandas as pd
 from io import BytesIO
 import json
 
+# condastats is installed via micropip (deps=False, since pandas is
+# already provided by Pyodide).  Only the pure-pandas query layer is used.
+from condastats import query_overall, query_grouped, top_packages as _top_packages
+
 _df = None
 _pkg_names = []
 _month_frames = {}
@@ -597,8 +602,29 @@ def activate_months(month_keys_json):
 def get_package_names():
     return json.dumps(_pkg_names)
 
+def _summary_stats(filtered):
+    """Build summary dict for the UI."""
+    total = int(filtered["counts"].sum())
+    n_platforms = int(filtered["pkg_platform"].nunique()) if "pkg_platform" in filtered.columns else 0
+    n_versions = int(filtered["pkg_version"].nunique()) if "pkg_version" in filtered.columns else 0
+    top_platform = str(filtered.groupby("pkg_platform")["counts"].sum().idxmax()) if n_platforms > 0 else ""
+    top_source = str(filtered.groupby("data_source")["counts"].sum().idxmax()) if "data_source" in filtered.columns else ""
+    return {
+        "total": total,
+        "platforms": n_platforms,
+        "versions": n_versions,
+        "top_platform": top_platform,
+        "top_source": top_source,
+    }
+
+def _fmt(x):
+    return f"{x:,}"
+
 def query(packages_str, query_type="overall"):
-    """Return JSON with table HTML, chart data, and summary stats."""
+    """Return JSON with table HTML, chart data, and summary stats.
+
+    Uses condastats.query_overall / query_grouped under the hood.
+    """
     if _df is None:
         return json.dumps({"error": "No data loaded."})
 
@@ -612,54 +638,42 @@ def query(packages_str, query_type="overall"):
         suggestions = ", ".join(matches) if matches else "none"
         return json.dumps({"error": f"No data found. Similar: {suggestions}"})
 
-    result = {}
+    result = {"summary": _summary_stats(filtered)}
 
-    # Summary stats
-    total = int(filtered["counts"].sum())
-    n_platforms = int(filtered["pkg_platform"].nunique()) if "pkg_platform" in filtered.columns else 0
-    n_versions = int(filtered["pkg_version"].nunique()) if "pkg_version" in filtered.columns else 0
-    top_platform = filtered.groupby("pkg_platform")["counts"].sum().idxmax() if n_platforms > 0 else ""
-    top_source = filtered.groupby("data_source")["counts"].sum().idxmax() if "data_source" in filtered.columns else ""
-    result["summary"] = {
-        "total": total,
-        "platforms": n_platforms,
-        "versions": n_versions,
-        "top_platform": str(top_platform),
-        "top_source": str(top_source),
-    }
+    if query_type == "overall":
+        grp = query_overall(_df, package=pkgs)           # Series: pkg_name -> count
+        grp = grp.sort_values(ascending=False)
 
-    # Build grouped data
-    if query_type == "overall" and len(pkgs) == 1:
-        # Single package overall -> hero number
-        result["hero"] = {"value": total, "label": f"total downloads for {pkgs[0]}"}
-        result["table"] = ""
-        result["chart"] = None
-    elif query_type == "overall":
-        # Multi-package comparison
-        grp = filtered.groupby("pkg_name", observed=True)["counts"].sum().sort_values(ascending=False)
-        result["chart"] = {
-            "labels": grp.index.tolist(),
-            "datasets": [{"label": "Downloads", "data": grp.values.tolist()}],
-        }
-        out = grp.reset_index()
-        out.columns = ["Package", "Downloads"]
-        out["Downloads"] = out["Downloads"].apply(lambda x: f"{x:,}")
-        result["table"] = out.to_html(index=False, border=0)
-    else:
-        # Grouped by dimension
         if len(pkgs) == 1:
-            grp = filtered.groupby(query_type, observed=True)["counts"].sum().sort_values(ascending=False)
+            total = int(grp.iloc[0]) if len(grp) > 0 else 0
+            result["hero"] = {"value": total, "label": f"total downloads for {pkgs[0]}"}
+            result["table"] = ""
+            result["chart"] = None
+        else:
+            result["chart"] = {
+                "labels": grp.index.tolist(),
+                "datasets": [{"label": "Downloads", "data": grp.values.tolist()}],
+            }
+            out = grp.reset_index()
+            out.columns = ["Package", "Downloads"]
+            out["Downloads"] = out["Downloads"].apply(_fmt)
+            result["table"] = out.to_html(index=False, border=0)
+    else:
+        grp = query_grouped(_df, query_type, package=pkgs)  # MultiIndex Series
+
+        if len(pkgs) == 1:
+            # Drop the pkg_name level – leaves just the dimension
+            grp = grp.droplevel("pkg_name").sort_values(ascending=False)
             result["chart"] = {
                 "labels": [str(x) for x in grp.index.tolist()],
                 "datasets": [{"label": pkgs[0], "data": grp.values.tolist()}],
             }
             out = grp.reset_index()
             out.columns = [query_type.replace("_", " ").title(), "Downloads"]
-            out["Downloads"] = out["Downloads"].apply(lambda x: f"{x:,}")
+            out["Downloads"] = out["Downloads"].apply(_fmt)
             result["table"] = out.to_html(index=False, border=0)
         else:
-            # Multi-package grouped comparison
-            pivot = filtered.groupby(["pkg_name", query_type], observed=True)["counts"].sum().unstack(fill_value=0)
+            pivot = grp.unstack(fill_value=0)
             all_dims = pivot.columns.tolist()
             datasets = []
             for pkg in pkgs:
@@ -669,11 +683,10 @@ def query(packages_str, query_type="overall"):
                 "labels": [str(d) for d in all_dims],
                 "datasets": datasets,
             }
-            # Flat table
-            flat = filtered.groupby(["pkg_name", query_type], observed=True)["counts"].sum().reset_index()
+            flat = grp.reset_index()
             flat.columns = ["Package", query_type.replace("_", " ").title(), "Downloads"]
             flat = flat.sort_values("Downloads", ascending=False)
-            flat["Downloads"] = flat["Downloads"].apply(lambda x: f"{x:,}")
+            flat["Downloads"] = flat["Downloads"].apply(_fmt)
             result["table"] = flat.to_html(index=False, border=0)
 
     return json.dumps(result)
@@ -681,14 +694,14 @@ def query(packages_str, query_type="overall"):
 def top_packages(n=20):
     if _df is None:
         return json.dumps({"error": "No data loaded."})
-    grp = _df.groupby("pkg_name", observed=True)["counts"].sum().sort_values(ascending=False).head(n)
+    grp = _top_packages(_df, n=n)                     # Series from condastats
     chart = {
         "labels": grp.index.tolist(),
         "datasets": [{"label": "Downloads", "data": grp.values.tolist()}],
     }
     out = grp.reset_index()
     out.columns = ["Package", "Downloads"]
-    out["Downloads"] = out["Downloads"].apply(lambda x: f"{x:,}")
+    out["Downloads"] = out["Downloads"].apply(_fmt)
     summary = {"total": int(grp.sum()), "packages": len(grp)}
     return json.dumps({"chart": chart, "table": out.to_html(index=False, border=0), "summary": summary})
 `;
@@ -704,7 +717,14 @@ async function initPyodide() {
   pyodide = await loadPyodide();
 
   setStatus("Installing pandas + fastparquet\u2026", "loading");
-  await pyodide.loadPackage(["pandas", "fastparquet"]);
+  await pyodide.loadPackage(["pandas", "fastparquet", "micropip"]);
+
+  setStatus("Installing condastats\u2026", "loading");
+  await pyodide.runPythonAsync(`
+import micropip
+await micropip.install("condastats")
+`);
+
   await pyodide.runPythonAsync(PYTHON_HELPERS);
 
   setStatus("Ready \u2014 pick an example or enter a package name.", "ready");
