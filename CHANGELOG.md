@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.0] - Unreleased
+## [0.3.0] - 2026-02-06
 
 ### Breaking Changes
 
@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Interactive browser demo (Pyodide) for trying condastats without installing
+- Diátaxis-based documentation with tutorial, how-to guides, explanation, and reference sections
+- `sphinx-design` cards, tabs, and grids on the documentation landing page
 - Type hints for all public functions in `cli.py`
 - Comprehensive test suite with 31 tests covering all CLI functions
 - Test coverage for multiple packages (pandas, numpy, scipy, requests, dask)
@@ -27,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Switch to `conda-sphinx-theme` for documentation
+- Reorder installer tabs (pixi first), add `pixi x` run-in-place option
 - Migrate from `setup.py`/`versioneer` to `pyproject.toml`/`setuptools_scm`
 - Move tests from `condastats/tests/` to top-level `tests/` directory
 - Update project URLs to conda-incubator organization
