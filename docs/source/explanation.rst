@@ -19,16 +19,19 @@ condastats is built on top of the `Anaconda public package data
 <https://github.com/ContinuumIO/anaconda-package-data>`_, a collection of
 hourly-summarized download counts for conda packages published on S3.
 
-Key facts:
+.. card:: Key facts
 
-* **Coverage:** download records since January 2017.
-* **Channels:** includes data from the default ``anaconda`` channel,
-  ``conda-forge``, and selected other channels.
-* **Update frequency:** the dataset is updated once a month with the
-  previous month's data.
-* **Format:** Apache Parquet files stored in
-  ``s3://anaconda-package-data/conda/monthly/``, organized by year and
-  month.
+   :octicon:`calendar` **Coverage:** download records since January 2017.
+
+   :octicon:`package` **Channels:** includes data from the default ``anaconda``
+   channel, ``conda-forge``, and selected other channels.
+
+   :octicon:`sync` **Update frequency:** the dataset is updated once a month
+   with the previous month's data.
+
+   :octicon:`file` **Format:** Apache Parquet files stored in
+   ``s3://anaconda-package-data/conda/monthly/``, organized by year and
+   month.
 
 
 How the data is organized
@@ -62,42 +65,53 @@ following columns:
 How condastats queries work
 ===========================
 
-When you run a query, condastats does the following:
+When you run a query, condastats performs the following steps:
 
-1. **Determine the time range.** If you pass ``--month``, a single Parquet
-   file is read. If you pass ``--start_month``/``--end_month``, the
-   corresponding range of files is read. If neither is given, *all*
-   available monthly files are read (this can be slow).
+.. dropdown:: 1. Determine the time range
+   :open:
 
-2. **Read from S3.** condastats uses `Dask <https://www.dask.org/>`_ to
-   lazily read the Parquet files directly from the public S3 bucket.
-   No authentication is needed — the data is publicly accessible.
+   If you pass ``--month``, a single Parquet file is read. If you pass
+   ``--start_month``/``--end_month``, the corresponding range of files is
+   read. If neither is given, *all* available monthly files are read (this
+   can be slow).
 
-3. **Filter by package.** Only rows matching the requested package name(s)
-   are kept.
+.. dropdown:: 2. Read from S3
 
-4. **Apply additional filters.** For the ``overall`` subcommand, optional
-   filters (platform, data source, version, Python version) further narrow
-   the result.
+   condastats uses `Dask <https://www.dask.org/>`_ to lazily read the
+   Parquet files directly from the public S3 bucket. No authentication is
+   needed -- the data is publicly accessible.
 
-5. **Aggregate.** The filtered rows are grouped and summed:
+.. dropdown:: 3. Filter by package
+
+   Only rows matching the requested package name(s) are kept.
+
+.. dropdown:: 4. Apply additional filters
+
+   For the ``overall`` subcommand, optional filters (platform, data source,
+   version, Python version) further narrow the result.
+
+.. dropdown:: 5. Aggregate
+
+   The filtered rows are grouped and summed:
 
    * ``overall`` groups by ``pkg_name`` (and optionally by ``time``).
    * ``pkg_platform``, ``data_source``, ``pkg_version``, ``pkg_python``
      group by ``pkg_name`` and their respective column.
 
-6. **Return the result.** The CLI prints the pandas result to stdout. The
-   Python API returns the :class:`pandas.Series` or
-   :class:`pandas.DataFrame` directly.
+.. dropdown:: 6. Return the result
+
+   The CLI prints the pandas result to stdout. The Python API returns the
+   :class:`pandas.Series` or :class:`pandas.DataFrame` directly.
 
 
 Performance considerations
 ==========================
 
-* **Network I/O is the bottleneck.** Each query must fetch Parquet data from
-  S3 over the internet. Specifying a narrow time range (``--month`` or a
-  small date range) will be significantly faster than querying all data
-  since 2017.
+.. important::
+
+   **Network I/O is the bottleneck.** Each query must fetch Parquet data from
+   S3 over the internet. Specifying a narrow time range will be significantly
+   faster than querying all data since 2017.
 
 * **Dask lazy evaluation.** condastats uses Dask to construct a lazy
   computation graph and only materializes the result at the end with

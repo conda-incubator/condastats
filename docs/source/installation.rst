@@ -8,84 +8,82 @@ condastats is available from both `conda-forge <https://anaconda.org/conda-forge
 and `PyPI <https://pypi.org/project/condastats/>`_. Choose whichever
 package manager you prefer.
 
+.. tab-set::
 
-.. contents::
-   :local:
-   :depth: 1
+   .. tab-item:: conda / mamba
+      :sync: conda
 
+      .. code-block:: console
 
-Using conda / mamba (recommended)
-=================================
+         $ conda install -c conda-forge condastats
 
-.. code-block:: console
+      Or with `mamba <https://mamba.readthedocs.io/>`_ (faster drop-in
+      replacement for conda):
 
-   $ conda install -c conda-forge condastats
+      .. code-block:: console
 
-Or with `mamba <https://mamba.readthedocs.io/>`_ (faster drop-in
-replacement for conda):
+         $ mamba install -c conda-forge condastats
 
-.. code-block:: console
+   .. tab-item:: pixi
+      :sync: pixi
 
-   $ mamba install -c conda-forge condastats
+      Add condastats to a `pixi <https://pixi.sh/>`_ project:
 
+      .. code-block:: console
 
-Using pixi
-===========
+         $ pixi add condastats
 
-Add condastats to a `pixi <https://pixi.sh/>`_ project:
+      Or install it as a globally available tool:
 
-.. code-block:: console
+      .. code-block:: console
 
-   $ pixi add condastats
+         $ pixi global install condastats
 
-Or install it as a globally available tool:
+   .. tab-item:: pip / uv
+      :sync: pip
 
-.. code-block:: console
+      .. code-block:: console
 
-   $ pixi global install condastats
+         $ pip install condastats
 
+      Or with `uv <https://docs.astral.sh/uv/>`_:
 
-Using pip / uv
-==============
+      .. code-block:: console
 
-.. code-block:: console
+         $ uv pip install condastats
 
-   $ pip install condastats
+   .. tab-item:: pipx
+      :sync: pipx
 
-Or with `uv <https://docs.astral.sh/uv/>`_:
+      Install as an isolated global tool with
+      `pipx <https://pipx.pypa.io/>`_:
 
-.. code-block:: console
+      .. code-block:: console
 
-   $ uv pip install condastats
+         $ pipx install condastats
 
 
 Run without installing
 ======================
 
-If you just need a quick one-off query, you can run condastats in a
-temporary environment using `uvx <https://docs.astral.sh/uv/guides/tools/>`_,
-`pipx run <https://pipx.pypa.io/>`_, or `pixi exec <https://pixi.sh/>`_:
+.. tip::
 
-.. code-block:: console
+   If you just need a quick one-off query, you can run condastats in a
+   temporary environment -- no permanent installation required.
 
-   $ uvx condastats overall pandas --month 2024-01
-   $ pipx run condastats overall pandas --month 2024-01
+.. tab-set::
 
-These download condastats into a temporary environment, run the command, and
-clean up afterwards — no permanent installation required.
+   .. tab-item:: uvx
 
+      .. code-block:: console
 
-Install as a global CLI tool
-============================
+         $ uvx condastats overall pandas --month 2024-01
 
-Use `pipx <https://pipx.pypa.io/>`_ or ``pixi global`` to install
-condastats into its own isolated environment while making the ``condastats``
-command available system-wide:
+   .. tab-item:: pipx run
 
-.. code-block:: console
+      .. code-block:: console
 
-   $ pipx install condastats
-   $ pixi global install condastats
+         $ pipx run condastats overall pandas --month 2024-01
 
 
 Verify the installation

@@ -35,7 +35,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov"]
-doc = ["sphinx", "conda-sphinx-theme", "sphinx-copybutton"]
+doc = ["sphinx", "conda-sphinx-theme", "sphinx-copybutton", "sphinx-design"]
 
 [project.scripts]
 condastats = "condastats.cli:main"
@@ -93,6 +93,7 @@ ruff = "*"
 sphinx = "*"
 conda-sphinx-theme = "*"
 sphinx-copybutton = "*"
+sphinx-design = "*"
 
 [tool.pixi.feature.py310.dependencies]
 python = "3.10.*"

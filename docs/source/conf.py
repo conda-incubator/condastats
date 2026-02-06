@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath("."))
 
 # -- Project information -----------------------------------------------------
 
-project = "condastats"
+project = html_title = "condastats"
 copyright = "2019-2026, Sophia Man Yang"
 author = "Sophia Man Yang"
 
@@ -24,6 +24,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx_copybutton",
+    "sphinx_design",
 ]
 
 source_suffix = ".rst"
@@ -37,6 +38,38 @@ html_theme = "conda_sphinx_theme"
 
 html_static_path = []
 htmlhelp_basename = "condastatsdoc"
+
+html_theme_options = {
+    "navigation_depth": -1,
+    "use_edit_page_button": True,
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/conda-incubator/condastats",
+            "icon": "fa-brands fa-square-github",
+            "type": "fontawesome",
+        },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/condastats/",
+            "icon": "fa-brands fa-python",
+            "type": "fontawesome",
+        },
+        {
+            "name": "conda-forge",
+            "url": "https://anaconda.org/conda-forge/condastats",
+            "icon": "fa-solid fa-cube",
+            "type": "fontawesome",
+        },
+    ],
+}
+
+html_context = {
+    "github_user": "conda-incubator",
+    "github_repo": "condastats",
+    "github_version": "main",
+    "doc_path": "docs/source",
+}
 
 # -- Intersphinx -------------------------------------------------------------
 

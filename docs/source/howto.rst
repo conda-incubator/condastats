@@ -19,37 +19,55 @@ Filter by time period
 
 Pass ``--month`` (CLI) or the ``month`` keyword (Python):
 
-.. code-block:: console
+.. tab-set::
 
-   $ condastats overall pandas --month 2024-01
+   .. tab-item:: CLI
 
-.. code-block:: python
+      .. code-block:: console
 
-   overall("pandas", month="2024-01")
+         $ condastats overall pandas --month 2024-01
+
+   .. tab-item:: Python
+
+      .. code-block:: python
+
+         overall("pandas", month="2024-01")
 
 **Date range**
 
 Pass ``--start_month`` and ``--end_month`` together:
 
-.. code-block:: console
+.. tab-set::
 
-   $ condastats overall pandas --start_month 2024-01 --end_month 2024-06
+   .. tab-item:: CLI
 
-.. code-block:: python
+      .. code-block:: console
 
-   overall("pandas", start_month="2024-01", end_month="2024-06")
+         $ condastats overall pandas --start_month 2024-01 --end_month 2024-06
+
+   .. tab-item:: Python
+
+      .. code-block:: python
+
+         overall("pandas", start_month="2024-01", end_month="2024-06")
 
 **Monthly breakdown**
 
 Add ``--monthly`` to split the result by month instead of summing:
 
-.. code-block:: console
+.. tab-set::
 
-   $ condastats overall pandas --start_month 2024-01 --end_month 2024-03 --monthly
+   .. tab-item:: CLI
 
-.. code-block:: python
+      .. code-block:: console
 
-   overall("pandas", start_month="2024-01", end_month="2024-03", monthly=True)
+         $ condastats overall pandas --start_month 2024-01 --end_month 2024-03 --monthly
+
+   .. tab-item:: Python
+
+      .. code-block:: python
+
+         overall("pandas", start_month="2024-01", end_month="2024-03", monthly=True)
 
 
 Group downloads by dimension
@@ -81,19 +99,20 @@ by a different column in the dataset:
 All four accept the same time-filtering options (``--month``,
 ``--start_month``/``--end_month``, ``--monthly``).
 
-**CLI example**
+.. tab-set::
 
-.. code-block:: console
+   .. tab-item:: CLI
 
-   $ condastats data_source pandas --month 2024-01
+      .. code-block:: console
 
-**Python example**
+         $ condastats data_source pandas --month 2024-01
 
-.. code-block:: python
+   .. tab-item:: Python
 
-   from condastats import data_source
+      .. code-block:: python
 
-   data_source("pandas", month="2024-01")
+         from condastats import data_source
+         data_source("pandas", month="2024-01")
 
 
 Filter overall downloads by multiple criteria
@@ -101,24 +120,30 @@ Filter overall downloads by multiple criteria
 
 The ``overall`` subcommand (and :func:`~condastats.overall` function) supports
 additional filter flags to narrow results by platform, data source, package
-version, and Python version — all at once:
+version, and Python version -- all at once:
 
-.. code-block:: console
+.. tab-set::
 
-   $ condastats overall pandas --month 2024-01 \
-       --pkg_platform linux-64 \
-       --data_source conda-forge \
-       --pkg_python 3.11
+   .. tab-item:: CLI
 
-.. code-block:: python
+      .. code-block:: console
 
-   overall(
-       "pandas",
-       month="2024-01",
-       pkg_platform="linux-64",
-       data_source="conda-forge",
-       pkg_python="3.11",
-   )
+         $ condastats overall pandas --month 2024-01 \
+             --pkg_platform linux-64 \
+             --data_source conda-forge \
+             --pkg_python 3.11
+
+   .. tab-item:: Python
+
+      .. code-block:: python
+
+         overall(
+             "pandas",
+             month="2024-01",
+             pkg_platform="linux-64",
+             data_source="conda-forge",
+             pkg_python="3.11",
+         )
 
 
 Compare multiple packages
@@ -126,13 +151,19 @@ Compare multiple packages
 
 Pass multiple package names on the command line, or a list in Python:
 
-.. code-block:: console
+.. tab-set::
 
-   $ condastats overall pandas numpy scipy --month 2024-01
+   .. tab-item:: CLI
 
-.. code-block:: python
+      .. code-block:: console
 
-   overall(["pandas", "numpy", "scipy"], month="2024-01")
+         $ condastats overall pandas numpy scipy --month 2024-01
+
+   .. tab-item:: Python
+
+      .. code-block:: python
+
+         overall(["pandas", "numpy", "scipy"], month="2024-01")
 
 This works with every subcommand, not just ``overall``.
 
@@ -149,7 +180,10 @@ By default :func:`~condastats.overall` aggregates results into a
    df = overall("pandas", month="2024-01", complete=True)
    df.head()
 
-This is useful when you want to do custom grouping or further analysis.
+.. tip::
+
+   This is useful when you want to do custom grouping or further analysis
+   with the full dataset.
 
 
 Use condastats in Jupyter notebooks
@@ -175,15 +209,25 @@ You can also call the CLI from a notebook cell with a ``!`` prefix:
 Run condastats without installing
 =================================
 
-If you just want a quick one-off query, use
-`uvx <https://docs.astral.sh/uv/guides/tools/>`__,
-`pipx run <https://pipx.pypa.io/>`__, or
-`pixi global <https://pixi.sh/>`__:
+.. seealso::
 
-.. code-block:: console
+   :ref:`installation` for full details on all installation methods.
 
-   $ uvx condastats overall pandas --month 2024-01
-   $ pipx run condastats overall pandas --month 2024-01
+If you just want a quick one-off query:
+
+.. tab-set::
+
+   .. tab-item:: uvx
+
+      .. code-block:: console
+
+         $ uvx condastats overall pandas --month 2024-01
+
+   .. tab-item:: pipx run
+
+      .. code-block:: console
+
+         $ pipx run condastats overall pandas --month 2024-01
 
 These download condastats into a temporary environment, run the command, and
-clean up afterwards — no permanent installation required.
+clean up afterwards -- no permanent installation required.
