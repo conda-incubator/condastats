@@ -40,13 +40,26 @@ Features
 Installation
 ------------
 
-Using conda (recommended)::
+Using conda / mamba / pixi (recommended)::
 
     conda install -c conda-forge condastats
+    # or
+    mamba install -c conda-forge condastats
+    # or
+    pixi add condastats
+    # or, to install as a global tool
+    pixi global install condastats
 
-Using pip::
+Using pip / uv / pipx::
 
     pip install condastats
+    # or
+    uv pip install condastats
+    # or, run without installing
+    uvx condastats overall pandas --month 2024-01
+    pipx run condastats overall pandas --month 2024-01
+    # or, install as a global tool
+    pipx install condastats
 
 Usage
 -----

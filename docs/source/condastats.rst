@@ -279,12 +279,12 @@ And we can see the monthly counts for each python version with the
 Python interface
 ----------------
 
-To use the Python interface, we need to import the functions from the
-``condastats`` package by running:
+To use the Python interface, import the functions from the
+``condastats`` package:
 
 .. code:: python
 
-    from condastats.cli import overall, pkg_platform, pkg_version, pkg_python, data_source
+    from condastats import overall, pkg_platform, pkg_version, pkg_python, data_source
 
 Here are the function signatures for these five functions:
 
@@ -295,9 +295,9 @@ Here are the function signatures for these five functions:
 
 .. parsed-literal::
 
-    Help on function overall in module condastats.cli:
+    Help on function overall in module condastats:
 
-    overall(package, month=None, start_month=None, end_month=None, monthly=False, pkg_platform=None, data_source=None, pkg_version=None, pkg_python=None)
+    overall(package, month=None, start_month=None, end_month=None, monthly=False, complete=False, pkg_platform=None, data_source=None, pkg_version=None, pkg_python=None)
 
 
 
@@ -308,7 +308,7 @@ Here are the function signatures for these five functions:
 
 .. parsed-literal::
 
-    Help on function pkg_platform in module condastats.cli:
+    Help on function pkg_platform in module condastats:
 
     pkg_platform(package, month=None, start_month=None, end_month=None, monthly=False)
 
@@ -321,7 +321,7 @@ Here are the function signatures for these five functions:
 
 .. parsed-literal::
 
-    Help on function pkg_version in module condastats.cli:
+    Help on function pkg_version in module condastats:
 
     pkg_version(package, month=None, start_month=None, end_month=None, monthly=False)
 
@@ -334,7 +334,7 @@ Here are the function signatures for these five functions:
 
 .. parsed-literal::
 
-    Help on function pkg_python in module condastats.cli:
+    Help on function pkg_python in module condastats:
 
     pkg_python(package, month=None, start_month=None, end_month=None, monthly=False)
 
@@ -347,7 +347,7 @@ Here are the function signatures for these five functions:
 
 .. parsed-literal::
 
-    Help on function data_source in module condastats.cli:
+    Help on function data_source in module condastats:
 
     data_source(package, month=None, start_month=None, end_month=None, monthly=False)
 
