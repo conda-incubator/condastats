@@ -17,8 +17,12 @@ package name and, optionally, by grouping dimension and/or time). The
 ``complete=True``.
 
 
-Functions
----------
+S3-backed functions
+-------------------
+
+These convenience functions read data from the public Anaconda S3 bucket
+via **dask** and return aggregated pandas results. They require ``dask``
+and ``s3fs`` to be installed.
 
 .. autofunction:: condastats.overall
 
@@ -31,10 +35,27 @@ Functions
 .. autofunction:: condastats.pkg_python
 
 
+Pure-pandas query functions
+---------------------------
+
+These functions operate on any :class:`pandas.DataFrame` that follows the
+Anaconda package-data schema (columns: ``pkg_name``, ``counts``, ``time``,
+``pkg_platform``, ``data_source``, ``pkg_version``, ``pkg_python``).
+
+They have **no dependency on dask or s3fs** and work anywhere pandas runs,
+including Pyodide.
+
+.. autofunction:: condastats.query_overall
+
+.. autofunction:: condastats.query_grouped
+
+.. autofunction:: condastats.top_packages
+
+
 Common parameters
 -----------------
 
-All five functions share a core set of parameters:
+The S3-backed functions share a core set of parameters:
 
 ``package``
    One or more package names. Pass a string for a single package or a list
