@@ -722,7 +722,7 @@ async function initPyodide() {
   setStatus("Installing condastats\u2026", "loading");
   await pyodide.runPythonAsync(`
 import micropip
-await micropip.install("condastats")
+await micropip.install("condastats", deps=False)
 `);
 
   await pyodide.runPythonAsync(PYTHON_HELPERS);
