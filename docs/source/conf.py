@@ -36,7 +36,8 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "conda_sphinx_theme"
 
-html_static_path = []
+html_static_path = ["_static"]
+html_extra_path = ["_extra"]
 htmlhelp_basename = "condastatsdoc"
 
 html_theme_options = {
