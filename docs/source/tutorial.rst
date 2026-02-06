@@ -42,7 +42,7 @@ The simplest query returns the *total* download count for a package since
    Name: counts, dtype: int64
 
 This sums all downloads across every month, platform, and channel in the
-`Anaconda public dataset <https://github.com/ContinuumIO/anaconda-package-data>`_.
+`Anaconda public dataset <https://github.com/anaconda/anaconda-package-data>`_.
 
 
 Step 2: Focus on a specific month

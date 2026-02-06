@@ -16,7 +16,7 @@ The Anaconda public dataset
 ===========================
 
 condastats is built on top of the `Anaconda public package data
-<https://github.com/ContinuumIO/anaconda-package-data>`_, a collection of
+<https://github.com/anaconda/anaconda-package-data>`_, a collection of
 hourly-summarized download counts for conda packages published on S3.
 
 .. card:: Key facts

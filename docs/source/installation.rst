@@ -10,20 +10,6 @@ package manager you prefer.
 
 .. tab-set::
 
-   .. tab-item:: conda / mamba
-      :sync: conda
-
-      .. code-block:: console
-
-         $ conda install -c conda-forge condastats
-
-      Or with `mamba <https://mamba.readthedocs.io/>`_ (faster drop-in
-      replacement for conda):
-
-      .. code-block:: console
-
-         $ mamba install -c conda-forge condastats
-
    .. tab-item:: pixi
       :sync: pixi
 
@@ -39,18 +25,32 @@ package manager you prefer.
 
          $ pixi global install condastats
 
-   .. tab-item:: pip / uv
+   .. tab-item:: conda / mamba
+      :sync: conda
+
+      .. code-block:: console
+
+         $ conda install -c conda-forge condastats
+
+      Or with `mamba <https://mamba.readthedocs.io/>`_ (faster drop-in
+      replacement for conda):
+
+      .. code-block:: console
+
+         $ mamba install -c conda-forge condastats
+
+   .. tab-item:: uv / pip
       :sync: pip
 
       .. code-block:: console
 
-         $ pip install condastats
+         $ uv pip install condastats
 
-      Or with `uv <https://docs.astral.sh/uv/>`_:
+      Or with plain `pip <https://pip.pypa.io/>`_:
 
       .. code-block:: console
 
-         $ uv pip install condastats
+         $ pip install condastats
 
    .. tab-item:: pipx
       :sync: pipx
@@ -72,6 +72,12 @@ Run without installing
    temporary environment -- no permanent installation required.
 
 .. tab-set::
+
+   .. tab-item:: pixi x
+
+      .. code-block:: console
+
+         $ pixi x condastats overall pandas --month 2024-01
 
    .. tab-item:: uvx
 
