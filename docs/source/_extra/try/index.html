@@ -720,9 +720,16 @@ async function initPyodide() {
   await pyodide.loadPackage(["pandas", "fastparquet", "micropip"]);
 
   setStatus("Installing condastats\u2026", "loading");
+  // Fetch the wheel URL from the PyPI JSON API, then install directly.
+  // This avoids micropip's dependency resolution (which conflicts with
+  // Pyodide-bundled packages like fsspec) while still pulling the latest
+  // release from PyPI.
+  const pypiResp = await fetch("https://pypi.org/pypi/condastats/json");
+  const pypiData = await pypiResp.json();
+  const wheelUrl = pypiData.urls.find(u => u.filename.endsWith(".whl")).url;
   await pyodide.runPythonAsync(`
 import micropip
-await micropip.install("condastats", deps=False)
+await micropip.install("${wheelUrl}", deps=False)
 `);
 
   await pyodide.runPythonAsync(PYTHON_HELPERS);
