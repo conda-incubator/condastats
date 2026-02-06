@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2026-02-06
+
+### Added
+
+- Python REPL in the browser demo using `pyodide.console.PyodideConsole` and
+  jQuery Terminal, with Prism.js syntax highlighting, tab completion, and
+  command history
+- 15 curated example query cards (replaced abandoned vaex with python-duckdb,
+  added linting evolution, HTTP clients, and Arrow by platform examples)
+- Shareable URL support with a "Copy link" button for reproducible queries
+- Quick date range presets (1 month, 3 months, 6 months, 1 year, 2 years)
+
+### Changed
+
+- Extract JavaScript and CSS from monolithic `index.html` into separate
+  `app.js` and `style.css` files for maintainability
+- Upgrade Pyodide to v0.29.3 and fix API drift (`isPyProxy` → `instanceof
+  pyodide.ffi.PyProxy`, `to_js` import path, `echo_command` removal)
+- Unify "Top 20 packages" into the general query flow instead of a separate
+  code path
+- Add `prettier` pre-commit hook for JS/CSS/HTML formatting
+
+### Fixed
+
+- Fix race condition in parallel parquet file loading (fetch in parallel,
+  parse sequentially to avoid global variable collision)
+- Fix micropip install by fetching wheel URL from PyPI JSON API
+- Fix loading feedback: status displayed on the Query button, active card
+  highlighting for selected examples
+
 ## [0.4.1] - 2026-02-06
 
 ### Fixed
