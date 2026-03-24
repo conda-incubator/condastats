@@ -56,32 +56,38 @@ Using pip / uv / pipx::
     # or
     uv pip install condastats
     # or, run without installing
-    uvx condastats overall pandas --month 2024-01
-    pipx run condastats overall pandas --month 2024-01
+    uvx condastats --preview pandas --month 2024-01
+    pipx run condastats --preview pandas --month 2024-01
     # or, install as a global tool
     pipx install condastats
 
 Usage
 -----
 
+The preferred interface is the flag-based preview CLI. Add ``--preview``
+before the packages to run either an overall query or a single grouped
+dimension. The legacy subcommand syntax still works but emits a deprecation warning;
+see the docs for the migration plan.
+
+
 Command Line
 ~~~~~~~~~~~~
 
 Get overall download counts for a package::
 
-    condastats overall pandas --month 2024-01
+    condastats --preview pandas --month 2024-01
 
 Get downloads grouped by platform::
 
-    condastats pkg_platform numpy --month 2024-01
+    condastats --preview --group pkg_platform numpy --month 2024-01
 
 Get downloads grouped by data source (anaconda vs conda-forge)::
 
-    condastats data_source scipy --month 2024-01
+    condastats --preview --group data_source scipy --month 2024-01
 
 Query multiple packages::
 
-    condastats overall pandas numpy dask --month 2024-01
+    condastats --preview pandas numpy dask --month 2024-01
 
 Python API
 ~~~~~~~~~~

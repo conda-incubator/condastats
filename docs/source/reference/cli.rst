@@ -4,138 +4,80 @@
 Command-line interface
 ======================
 
-condastats provides a ``condastats`` command with several subcommands for
-querying package download statistics.
-
+condastats now routes CLI requests through a flag-based preview entry point
+when ``--preview`` appears before the packages. This syntax mirrors the
+existing functions and grouping dimensions while keeping the legacy
+subcommand path for backward compatibility (the legacy path emits a
+deprecation warning). The flag-based preview CLI is documented here; see
+:doc:`cli-legacy` for the older subcommand interface.
 
 General usage
 =============
 
+The preview CLI uses a package-first syntax with optional filters:
+
 .. code-block:: console
 
-   $ condastats [--version] [--help] <subcommand> [options] package [package ...]
+   $ condastats --preview pandas --month 2024-01
+   $ condastats --preview --group pkg_platform pandas --month 2024-01
+   $ condastats --preview pandas numpy --month 2024-01 --pkg_platform linux-64
+
+``--preview``
+   Route execution to the flag-based preview parser. This flag must appear
+   before the first package name.
 
 ``--version``
-   Print the installed condastats version and exit.
+   Print the installed ``condastats`` version and exit.
 
 ``--help``
    Show the help message and exit.
 
+Routing behavior
+================
 
-Subcommands
-===========
+.. mermaid::
 
-overall
--------
+   flowchart TB
+       root["condastats [--preview] [--version] ..."]
+       root --> router["command router"]
+       router --> decision{"--preview present?"}
+       decision -->|No| legacy["Subcommand path"]
+       decision -->|Yes| preview["Preview path"]
+       legacy --> warn["Emit deprecation warning with preview hint"]
+       legacy --> dispatch["Parse, validate, and dispatch subcommands"]
+       preview --> strip["Remove --preview before handling preview args"]
+       strip --> preview_exec["Parse flag-based args and dispatch supported queries"]
 
-Return aggregate download counts, optionally filtered by platform, data
-source, package version, or Python version.
+Preview usage
+=============
 
-.. code-block:: console
+The preview path supports two kinds of queries:
 
-   $ condastats overall [options] package [package ...]
+- **Overall queries** (the default). You can apply the full suite of filter
+  flags: ``--complete``, ``--pkg_platform``, ``--data_source``,
+  ``--pkg_version``, and ``--pkg_python``.
+- **Grouped queries**. Supply a single ``--group`` value to replace the
+  grouping subcommand. Grouped queries currently only accept the common time
+  filters (``--month``, ``--start_month``, ``--end_month``, ``--monthly``)
+  and do *not* accept ``--complete`` or the overall-only filters.
 
-Options (in addition to the :ref:`common options <cli-common-options>`):
+Grouped preview queries intentionally keep the same output as the legacy
+subcommands; in other words, ``condastats --preview --group pkg_platform`` is
+behaviorally identical to the old ``condastats pkg_platform`` invocation,
+just with a different syntax.
 
-``--complete``
-   Return all rows from the dataset instead of aggregated counts.
-
-``--pkg_platform PLATFORM``
-   Filter by platform (e.g., ``linux-64``, ``osx-arm64``, ``win-64``).
-
-``--data_source SOURCE``
-   Filter by data source (e.g., ``anaconda``, ``conda-forge``).
-
-``--pkg_version VERSION``
-   Filter by package version (e.g., ``1.5.3``).
-
-``--pkg_python VERSION``
-   Filter by Python version (e.g., ``3.11``).
-
-**Examples:**
-
-.. code-block:: console
-
-   $ condastats overall pandas
-   $ condastats overall pandas --month 2024-01
-   $ condastats overall pandas --month 2024-01 --pkg_platform linux-64
-   $ condastats overall pandas numpy dask --start_month 2024-01 --end_month 2024-06 --monthly
-
-
-pkg_platform
-------------
-
-Return download counts grouped by platform.
-
-.. code-block:: console
-
-   $ condastats pkg_platform [options] package [package ...]
-
-**Example:**
-
-.. code-block:: console
-
-   $ condastats pkg_platform pandas --month 2024-01
-
-
-data_source
------------
-
-Return download counts grouped by data source (channel).
-
-.. code-block:: console
-
-   $ condastats data_source [options] package [package ...]
-
-**Example:**
-
-.. code-block:: console
-
-   $ condastats data_source pandas --month 2024-01
-
-
-pkg_version
------------
-
-Return download counts grouped by package version.
-
-.. code-block:: console
-
-   $ condastats pkg_version [options] package [package ...]
-
-**Example:**
-
-.. code-block:: console
-
-   $ condastats pkg_version pandas --month 2024-01
-
-
-pkg_python
-----------
-
-Return download counts grouped by Python version.
-
-.. code-block:: console
-
-   $ condastats pkg_python [options] package [package ...]
-
-**Example:**
-
-.. code-block:: console
-
-   $ condastats pkg_python pandas --month 2024-01
-
-
-.. _cli-common-options:
+Preview queries always expect at least one package. Multiple packages remain
+space-separated, just like the legacy CLI.
 
 Common options
 ==============
 
-These options are available on **every** subcommand:
+.. _cli-common-options:
+
+These options apply to **every** preview query:
 
 ``package``
-   **Required.** One or more package names. Multiple names are
-   space-separated.
+   **Required.** One or more package names. Multiple names are space-separated.
 
 ``--month YYYY-MM``
    Restrict results to a single month. Cannot be used together with
@@ -148,9 +90,56 @@ These options are available on **every** subcommand:
    End of a date range (inclusive). Must be combined with ``--start_month``.
 
 ``--monthly``
-   Return per-month counts instead of a single total. Most useful with a
-   date range.
+   Return per-month counts instead of a single total. Most useful with a date
+   range.
 
+Overall query filters
+=====================
+
+When ``--group`` is omitted, the preview CLI calls :func:`~condastats.overall`
+and supports the additional filters listed below:
+
+``--complete``
+   Return every row instead of aggregated counts.
+
+``--pkg_platform PLATFORM``
+   Limit results to a single platform (e.g., ``linux-64``, ``osx-arm64``,
+   ``win-64``).
+
+``--data_source SOURCE``
+   Limit results to a specific channel or repository (e.g., ``anaconda``,
+   ``conda-forge``).
+
+``--pkg_version VERSION``
+   Limit results to a precise package version (e.g., ``1.5.3``).
+
+``--pkg_python VERSION``
+   Limit results to a Python version (e.g., ``3.11``).
+
+Grouped queries
+===============
+
+Use ``--group`` to ask for a dimensionally grouped result. Each supported value
+corresponds to a legacy grouping subcommand:
+
+- ``pkg_platform``: group by ``pkg_platform`` (platform architecture).
+- ``data_source``: group by ``data_source`` (channel).
+- ``pkg_version``: group by ``pkg_version`` (package version).
+- ``pkg_python``: group by ``pkg_python`` (Python version built for).
+
+.. code-block:: console
+
+   $ condastats --preview --group data_source pandas --month 2024-01
+
+Grouped queries only respect the common time filters listed above and cannot
+combine with ``--complete`` or the overall-only filters.
+
+Legacy subcommand reference
+===========================
+
+The legacy subcommand interface still works and is documented in
+:doc:`cli-legacy`, but it emits a deprecation warning and will be
+removed after the preview syntax matures.
 
 Exit codes
 ==========

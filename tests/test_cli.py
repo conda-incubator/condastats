@@ -11,7 +11,8 @@ import pandas as pd
 import pytest
 
 from condastats import __version__
-from condastats.cli import _build_parser, _validate_args, main
+from condastats.cli import main
+from condastats.cli_legacy import _build_parser, _validate_args
 
 # Fake data returned by mocked functions
 _FAKE_SERIES = pd.Series(
@@ -126,7 +127,7 @@ class TestMainIntegration:
     test_groupby.py.
     """
 
-    @patch("condastats.cli.overall", return_value=_FAKE_SERIES)
+    @patch("condastats.cli_legacy.overall", return_value=_FAKE_SERIES)
     def test_main_overall(self, mock_overall, capsys):
         """main() should call overall() and print results."""
         result = main(["overall", "pandas", "--month", "2019-01"])
@@ -137,7 +138,7 @@ class TestMainIntegration:
         call_kwargs = mock_overall.call_args
         assert call_kwargs.kwargs["package"] == ["pandas"]
 
-    @patch("condastats.cli.overall", return_value=_FAKE_DF)
+    @patch("condastats.cli_legacy.overall", return_value=_FAKE_DF)
     def test_main_overall_with_filters(self, mock_overall, capsys):
         """main() should pass all filter options to overall()."""
         main(
@@ -166,7 +167,7 @@ class TestMainIntegration:
         assert call_kwargs["pkg_python"] == "2.6"
         assert call_kwargs["complete"] is True
 
-    @patch("condastats.cli.overall", return_value=_FAKE_MONTHLY)
+    @patch("condastats.cli_legacy.overall", return_value=_FAKE_MONTHLY)
     def test_main_overall_date_range(self, mock_overall, capsys):
         """main() should pass date range options to overall()."""
         main(
@@ -199,7 +200,7 @@ class TestMainIntegration:
     def test_main_groupby_subcommands(self, capsys, subcommand):
         """main() should dispatch to the correct groupby function."""
         mock_fn = lambda **kwargs: _FAKE_GROUPBY  # noqa: E731
-        with patch.dict("condastats.cli._GROUPBY_FUNCS", {subcommand: mock_fn}):
+        with patch.dict("condastats.cli_legacy._GROUPBY_FUNCS", {subcommand: mock_fn}):
             main([subcommand, "pandas", "--month", "2019-01"])
             captured = capsys.readouterr()
             assert "pandas" in captured.out

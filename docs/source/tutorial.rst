@@ -26,7 +26,7 @@ The simplest query returns the *total* download count for a package since
 
       .. code-block:: console
 
-         $ condastats overall pandas
+         $ condastats --preview pandas
 
    .. tab-item:: Python
 
@@ -56,7 +56,7 @@ Add ``--month`` to restrict the query to a single month:
 
       .. code-block:: console
 
-         $ condastats overall pandas --month 2024-01
+         $ condastats --preview pandas --month 2024-01
 
    .. tab-item:: Python
 
@@ -83,7 +83,7 @@ Provide a range with ``--start_month`` and ``--end_month``, then pass
 
       .. code-block:: console
 
-         $ condastats overall pandas --start_month 2024-01 --end_month 2024-03 --monthly
+         $ condastats --preview pandas --start_month 2024-01 --end_month 2024-03 --monthly
 
    .. tab-item:: Python
 
@@ -103,8 +103,8 @@ Provide a range with ``--start_month`` and ``--end_month``, then pass
 Step 4: Break down by a dimension
 ==================================
 
-Use a different subcommand to group downloads by platform, data source,
-package version, or Python version:
+Use ``--group`` to group downloads by platform, data source, package version,
+or Python version:
 
 .. tab-set::
 
@@ -112,7 +112,7 @@ package version, or Python version:
 
       .. code-block:: console
 
-         $ condastats pkg_platform pandas --month 2024-01
+         $ condastats --preview --group pkg_platform pandas --month 2024-01
 
    .. tab-item:: Python
 
@@ -145,7 +145,7 @@ Both the CLI and the Python API accept multiple package names:
 
       .. code-block:: console
 
-         $ condastats overall pandas numpy dask --month 2024-01
+         $ condastats --preview pandas numpy dask --month 2024-01
 
    .. tab-item:: Python
 
@@ -190,7 +190,8 @@ What next?
       :link: reference/cli
       :link-type: doc
 
-      All subcommands, options, and exit codes.
+      Full preview CLI options and exit codes; legacy subcommands live in
+      :doc:`reference/cli-legacy`.
 
    .. grid-item-card:: :octicon:`light-bulb` Explanation
       :link: explanation

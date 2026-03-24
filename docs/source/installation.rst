@@ -77,19 +77,19 @@ Run without installing
 
       .. code-block:: console
 
-         $ pixi x condastats overall pandas --month 2024-01
+         $ pixi x condastats --preview pandas --month 2024-01
 
    .. tab-item:: uvx
 
       .. code-block:: console
 
-         $ uvx condastats overall pandas --month 2024-01
+         $ uvx condastats --preview pandas --month 2024-01
 
    .. tab-item:: pipx run
 
       .. code-block:: console
 
-         $ pipx run condastats overall pandas --month 2024-01
+         $ pipx run condastats --preview pandas --month 2024-01
 
 
 Verify the installation

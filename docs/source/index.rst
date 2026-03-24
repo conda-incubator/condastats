@@ -6,7 +6,14 @@ conda packages from the `Anaconda public dataset`_.
 
 .. code-block:: console
 
-   $ condastats overall pandas --month 2024-01
+   $ condastats --preview pandas --month 2024-01
+
+.. note::
+
+   Use the flag-based preview CLI (``condastats --preview``) for both overall
+   and grouped queries. The legacy subcommand path still works but now emits
+   a deprecation warning; see :doc:`reference/cli` for the preview workflow and
+   :doc:`reference/cli-legacy` for the older commands.
 
 .. code-block:: python
 
@@ -26,26 +33,26 @@ Run condastats without installing -- just pick your tool:
 
       .. code-block:: console
 
-         $ pixi x condastats overall pandas --month 2024-01
+         $ pixi x condastats --preview pandas --month 2024-01
 
    .. tab-item:: conda
 
       .. code-block:: console
 
          $ conda install -c conda-forge condastats
-         $ condastats overall pandas --month 2024-01
+         $ condastats --preview pandas --month 2024-01
 
    .. tab-item:: uvx
 
       .. code-block:: console
 
-         $ uvx condastats overall pandas --month 2024-01
+         $ uvx condastats --preview pandas --month 2024-01
 
    .. tab-item:: pipx run
 
       .. code-block:: console
 
-         $ pipx run condastats overall pandas --month 2024-01
+         $ pipx run condastats --preview pandas --month 2024-01
 
 See :doc:`installation` for all options, or
 `try it in your browser <try/>`__ -- no installation needed.
@@ -110,8 +117,9 @@ See :doc:`installation` for all options, or
       :link: reference/cli
       :link-type: doc
 
-      Complete command-line interface documentation with all subcommands,
-      options, and examples.
+      Complete documentation for the flag-based preview CLI
+      (``condastats --preview``). Legacy subcommand usage is documented at
+      :doc:`reference/cli-legacy`.
 
 .. toctree::
    :hidden:
@@ -123,3 +131,4 @@ See :doc:`installation` for all options, or
    explanation
    reference/api
    reference/cli
+   reference/cli-legacy

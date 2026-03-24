@@ -1,0 +1,172 @@
+"""Preview flag-based command-line interface for condastats."""
+
+import argparse
+import sys
+from datetime import datetime
+
+from condastats import __version__
+from condastats._core import (
+    data_source,
+    overall,
+    pkg_platform,
+    pkg_python,
+    pkg_version,
+)
+
+
+def _month_type(value: str) -> datetime:
+    """Parse a YYYY-MM string into a datetime."""
+    try:
+        return datetime.strptime(value, "%Y-%m")
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"invalid month format: '{value}' (expected YYYY-MM)"
+        )
+
+
+def _add_common_args(parser: argparse.ArgumentParser) -> None:
+    """Add arguments shared by preview queries."""
+    parser.add_argument("package", help="package name(s)", nargs="+")
+    parser.add_argument(
+        "--month",
+        help="month - YYYY-MM (default: None)",
+        type=_month_type,
+        default=None,
+    )
+    parser.add_argument(
+        "--start_month",
+        help="start month - YYYY-MM (default: None)",
+        type=_month_type,
+        default=None,
+    )
+    parser.add_argument(
+        "--end_month",
+        help="end month - YYYY-MM (default: None)",
+        type=_month_type,
+        default=None,
+    )
+    parser.add_argument(
+        "--monthly",
+        help="return monthly values (default: False)",
+        action="store_true",
+    )
+
+
+def _build_parser() -> argparse.ArgumentParser:
+    """Build and return the preview argument parser."""
+    parser = argparse.ArgumentParser(
+        prog="condastats --preview",
+        description="Query download statistics with the preview flag-based CLI.",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
+    )
+    parser.add_argument(
+        "--group",
+        choices=("pkg_platform", "data_source", "pkg_version", "pkg_python"),
+        default=None,
+        help="group by dimension (default: overall query)",
+    )
+    _add_common_args(parser)
+    parser.add_argument(
+        "--complete",
+        help="return all values (default: False)",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--pkg_platform",
+        help="package platform, e.g. win-64, linux-32, osx-64 (default: None)",
+        default=None,
+    )
+    parser.add_argument(
+        "--pkg_python",
+        help="Python version, e.g. 3.7 (default: None)",
+        default=None,
+    )
+    parser.add_argument(
+        "--pkg_version",
+        help="package version, e.g. 0.1.0 (default: None)",
+        default=None,
+    )
+    parser.add_argument(
+        "--data_source",
+        help="data source, e.g. anaconda, conda-forge (default: None)",
+        default=None,
+    )
+    return parser
+
+
+def _validate_args(args: argparse.Namespace, parser: argparse.ArgumentParser) -> None:
+    """Validate preview argument combinations."""
+    has_start = args.start_month is not None
+    has_end = args.end_month is not None
+    if has_start != has_end:
+        parser.error("--start_month and --end_month must be used together")
+
+    if args.month is not None and (has_start or has_end):
+        parser.error("--month cannot be used with --start_month/--end_month")
+
+    if args.group is not None:
+        if args.complete:
+            parser.error("--complete is only supported for overall preview queries")
+
+        if any(
+            (
+                args.pkg_platform is not None,
+                args.data_source is not None,
+                args.pkg_version is not None,
+                args.pkg_python is not None,
+            )
+        ):
+            parser.error(
+                "preview grouped queries currently do not support overall filter flags"
+            )
+
+
+_GROUPBY_FUNCS = {
+    "pkg_platform": pkg_platform,
+    "data_source": data_source,
+    "pkg_version": pkg_version,
+    "pkg_python": pkg_python,
+}
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Entry point for the preview condastats CLI."""
+    import pandas as pd
+
+    pd.set_option("display.max_rows", None)
+
+    parser = _build_parser()
+    args = parser.parse_args(argv)
+    _validate_args(args, parser)
+
+    common_kwargs = dict(
+        package=args.package,
+        month=args.month,
+        start_month=args.start_month,
+        end_month=args.end_month,
+        monthly=args.monthly,
+    )
+
+    if args.group is None:
+        result = overall(
+            **common_kwargs,
+            complete=args.complete,
+            pkg_platform=args.pkg_platform,
+            data_source=args.data_source,
+            pkg_version=args.pkg_version,
+            pkg_python=args.pkg_python,
+        )
+    else:
+        func = _GROUPBY_FUNCS[args.group]
+        result = func(**common_kwargs)
+
+    print(result)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

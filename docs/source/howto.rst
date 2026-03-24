@@ -7,6 +7,12 @@ How-to guides
 Practical recipes for common tasks. Each guide assumes you have already
 installed condastats (see :doc:`installation`).
 
+.. note::
+
+   The CLI examples in this page use the flag-based preview syntax
+   (``condastats --preview``). Legacy subcommands still work and are detailed in
+   :doc:`reference/cli-legacy`.
+
 .. contents:: Recipes
    :local:
    :depth: 1
@@ -25,7 +31,7 @@ Pass ``--month`` (CLI) or the ``month`` keyword (Python):
 
       .. code-block:: console
 
-         $ condastats overall pandas --month 2024-01
+         $ condastats --preview pandas --month 2024-01
 
    .. tab-item:: Python
 
@@ -43,7 +49,7 @@ Pass ``--start_month`` and ``--end_month`` together:
 
       .. code-block:: console
 
-         $ condastats overall pandas --start_month 2024-01 --end_month 2024-06
+         $ condastats --preview pandas --start_month 2024-01 --end_month 2024-06
 
    .. tab-item:: Python
 
@@ -61,7 +67,7 @@ Add ``--monthly`` to split the result by month instead of summing:
 
       .. code-block:: console
 
-         $ condastats overall pandas --start_month 2024-01 --end_month 2024-03 --monthly
+         $ condastats --preview pandas --start_month 2024-01 --end_month 2024-03 --monthly
 
    .. tab-item:: Python
 
@@ -73,14 +79,14 @@ Add ``--monthly`` to split the result by month instead of summing:
 Group downloads by dimension
 ============================
 
-condastats has four grouping subcommands. Each one splits download counts
-by a different column in the dataset:
+Use ``--group`` with one of four supported dimensions. Each dimension splits
+download counts by a different column in the dataset:
 
 .. list-table::
    :header-rows: 1
    :widths: 25 40 35
 
-   * - Subcommand / function
+   * - Dimension / function
      - Groups by
      - Example values
    * - ``pkg_platform``
@@ -99,13 +105,16 @@ by a different column in the dataset:
 All four accept the same time-filtering options (``--month``,
 ``--start_month``/``--end_month``, ``--monthly``).
 
+The dimension values also match the legacy subcommand names, so the behavior
+remains consistent for users already familiar with those commands.
+
 .. tab-set::
 
    .. tab-item:: CLI
 
       .. code-block:: console
 
-         $ condastats data_source pandas --month 2024-01
+         $ condastats --preview --group data_source pandas --month 2024-01
 
    .. tab-item:: Python
 
@@ -118,7 +127,7 @@ All four accept the same time-filtering options (``--month``,
 Filter overall downloads by multiple criteria
 ==============================================
 
-The ``overall`` subcommand (and :func:`~condastats.overall` function) supports
+The default preview query (and :func:`~condastats.overall` function) supports
 additional filter flags to narrow results by platform, data source, package
 version, and Python version -- all at once:
 
@@ -128,7 +137,7 @@ version, and Python version -- all at once:
 
       .. code-block:: console
 
-         $ condastats overall pandas --month 2024-01 \
+         $ condastats --preview pandas --month 2024-01 \
              --pkg_platform linux-64 \
              --data_source conda-forge \
              --pkg_python 3.11
@@ -157,7 +166,7 @@ Pass multiple package names on the command line, or a list in Python:
 
       .. code-block:: console
 
-         $ condastats overall pandas numpy scipy --month 2024-01
+         $ condastats --preview pandas numpy scipy --month 2024-01
 
    .. tab-item:: Python
 
@@ -165,7 +174,7 @@ Pass multiple package names on the command line, or a list in Python:
 
          overall(["pandas", "numpy", "scipy"], month="2024-01")
 
-This works with every subcommand, not just ``overall``.
+This works with every preview query, including grouped dimensions via ``--group``.
 
 
 Get the raw DataFrame
@@ -203,7 +212,7 @@ You can also call the CLI from a notebook cell with a ``!`` prefix:
 
 .. code-block:: text
 
-   !condastats pkg_platform pandas --month 2024-01
+   !condastats --preview --group pkg_platform pandas --month 2024-01
 
 
 Run condastats without installing
@@ -221,13 +230,13 @@ If you just want a quick one-off query:
 
       .. code-block:: console
 
-         $ uvx condastats overall pandas --month 2024-01
+         $ uvx condastats --preview pandas --month 2024-01
 
    .. tab-item:: pipx run
 
       .. code-block:: console
 
-         $ pipx run condastats overall pandas --month 2024-01
+         $ pipx run condastats --preview pandas --month 2024-01
 
 These download condastats into a temporary environment, run the command, and
 clean up afterwards -- no permanent installation required.

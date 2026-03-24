@@ -87,7 +87,7 @@ When you run a query, condastats performs the following steps:
 
 .. dropdown:: 4. Apply additional filters
 
-   For the ``overall`` subcommand, optional filters (platform, data source,
+   For the default preview ``overall`` query, optional filters (platform, data source,
    version, Python version) further narrow the result.
 
 .. dropdown:: 5. Aggregate
