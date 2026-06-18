@@ -78,7 +78,7 @@ test = "pytest -v --cov=condastats --cov-report=term-missing"
 lint = "ruff check ."
 format = "ruff format ."
 format-check = "ruff format --check ."
-docs = { cmd = "sphinx-build -M dirhtml source _build", cwd = "docs" }
+docs = { cmd = "sphinx-build -M html source _build", cwd = "docs" }
 
 # -- Features ---------------------------------------------------------------
 
