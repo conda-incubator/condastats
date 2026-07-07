@@ -11,7 +11,7 @@ packages, compare statistics, and explore charts -- all client-side.
 
 .. raw:: html
 
-   <a href="../try/"
+   <a href="try/"
       style="display:inline-block;padding:0.7rem 1.5rem;font-size:1.05rem;
              font-weight:600;color:#fff;background:#348721;border-radius:6px;
              text-decoration:none;margin:0.5rem 0 1.5rem;"
